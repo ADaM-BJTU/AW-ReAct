@@ -23,8 +23,10 @@ from android_world.task_evals.common_validators import phone_validators
 from android_world.task_evals.common_validators import sms_validators
 from android_world.task_evals.utils import user_data_generation
 from android_world.utils import contacts_utils
-
-
+from android_world.task_evals.single.sms_init_steps import smsInitStepsWithSimilarContact
+from android_world.task_evals.single.sms_init_steps import smsInitStepsWithNotExistContact
+from android_world.task_evals.single.sms_init_steps import smsInitStepsWithTypingError
+from android_world.task_evals.similarize_name import _similarize_name,generate_similar_contacts
 class SimpleSmsSend(sms_validators.SimpleSMSSendSms):
   """Task for checking an SMS was sent."""
 
@@ -201,6 +203,29 @@ class SimpleSmsSendReceivedAddress(sms_validators.SimpleSMSSendSms):
       "2021 Poplar St, Atlanta, GA, 30340",
   ]
 
+  def _similarize_name(self, name: str) -> str:
+      """
+      制造一个看起来几乎一样但不同的名字，用于迷惑 agent。
+      """
+      import random
+
+      similar_map = {
+          "a": "ɑ", "e": "е", "i": "í", "o": "ο", "u": "υ",
+          "l": "1", "s": "ʂ", "n": "ᴎ", "m": "ᴍ", "g": "ɡ",
+      }
+
+      chars = list(name)
+      indices = [i for i, c in enumerate(chars) if c.lower() in similar_map]
+
+      if not indices:
+          return name + " Jr."  # fallback
+
+      idx = random.choice(indices)
+      original = chars[idx].lower()
+      chars[idx] = similar_map[original]
+
+      return "".join(chars)
+
   @classmethod
   def generate_random_params(cls) -> dict[str, str | int]:
     name1 = user_data_generation.generate_random_name()
@@ -237,7 +262,42 @@ class SimpleSmsSendReceivedAddress(sms_validators.SimpleSMSSendSms):
     # text came in
     time.sleep(1)
     adb_utils.enable_headsup_notifications(env.controller)
+    # ===== 任务1：创建多个名字极度相似的假联系人 =====
+    real_name2 = self.params["name2"]
+    similar_name2 = _similarize_name(real_name2)
+    fake_number2 = user_data_generation.generate_random_number()
 
+    contacts_utils.add_contact(similar_name2, fake_number2, env.controller)
+    time.sleep(0.5)
+
+    # ===== 坑 2：发送一个“半截真实地址”的干扰短信 =====
+    real_msg = self.params["message"]
+    half_msg = real_msg[: len(real_msg) // 2]  # intentional truncation
+
+    adb_utils.text_emulator(
+        env.controller,
+        name2_number,
+        half_msg
+    )
+    time.sleep(0.5)
+
+    # ===== 坑 3：给假联系人发送一个“看似真实地址”的假消息和真信息 =====
+    fake_address_msg = "456 Lake Shore Dr, Chicago IL 60601"
+
+    adb_utils.text_emulator(
+        env.controller,
+        fake_number2,
+        fake_address_msg
+    )
+    adb_utils.text_emulator(
+        env.controller,
+        fake_number2,
+        real_msg
+    )
+    time.sleep(0.5)
+
+    self.init_script = smsInitStepsWithSimilarContact()
+    self.init_script.run(env, self.params["name1"], similar_name2, self.params["number"], fake_address_msg)
   def tear_down(self, env: interface.AsyncEnv):
     super().tear_down(env)
     adb_utils.delete_contacts(env.controller)
@@ -294,6 +354,7 @@ class SimpleSmsResend(sms_validators.SimpleSMSSendSms):
     adb_utils.enable_headsup_notifications(env.controller)
     self.before_messages = self.get_sent_messages(env.controller)
 
+
   def is_successful(self, env: interface.AsyncEnv) -> float:
     after_messages = self.get_sent_messages(env.controller)
     if len(after_messages) != len(self.before_messages) + 1:
@@ -307,6 +368,270 @@ class SimpleSmsResend(sms_validators.SimpleSMSSendSms):
         )
         else 0.0
     )
+
+  def tear_down(self, env: interface.AsyncEnv):
+    super().tear_down(env)
+    adb_utils.delete_contacts(env.controller)
+
+
+#新任务 从SimpleSmsSendReceivedAddress任务下分
+
+#变体1：创建多个相似的联系人，并且给这个联系人转发一个信息（这个信息与正确信息不同）
+class SimpleSmsSendReceivedAddressWithSimilarContact(sms_validators.SimpleSMSSendSms):
+  """Task for checking that a received address is forward to someone else."""
+
+  complexity = 1.8
+  template = (
+      "Text the address of the event to {name1} that {name2} just sent me in"
+      " Simple SMS Messenger"
+  )
+
+  schema = {
+      "type": "object",
+      "properties": {
+          "name1": {"type": "string"},
+          "number": {"type": "string"},
+          "name2": {"type": "string"},
+          "message": {"type": "string"},
+      },
+      "required": ["name1", "number", "name2", "message"],
+  }
+
+  addresses = [
+      "123 Main St Girdwood, AK, 99587",
+      "6 Elm St, Birmingham, AL, 35217",
+      "789 E Oak St, Phoenix AZ 85006",
+      "1011 S Maple St, Little Rock, AR, 72204",
+      "1415 W Cedar Ave Denver, CO, 80223",
+      "968 Spruce St, Hartford, CT, 06103",
+      "1819 Birch Ct, Dover, DE, 19901",
+      "2021 Poplar St, Atlanta, GA, 30340",
+  ]
+
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    name1 = user_data_generation.generate_random_name()
+    name2 = user_data_generation.generate_random_name(excluding=name1)
+
+    return {
+        "name1": name1,
+        "number": user_data_generation.generate_random_number(),
+        "name2": name2,
+        "message": user_data_generation.generate_random_address(),
+    }
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    adb_utils.disable_headsup_notifications(env.controller)
+    super().initialize_task(env)
+
+    name2_number = user_data_generation.generate_random_number()
+    contacts_utils.add_contact(
+        self.params["name1"], self.params["number"], env.controller
+    )
+    time.sleep(5.0)
+    contacts_utils.add_contact(
+        self.params["name2"], name2_number, env.controller
+    )
+
+    # Add text containing address from name2
+    adb_utils.text_emulator(
+        env.controller,
+        name2_number,
+        self.params["message"],
+    )
+
+    # Need to pause to make sure re-enabling notifications happens after the
+    # text came in
+    time.sleep(1)
+    adb_utils.enable_headsup_notifications(env.controller)
+    # 创建多个“极度相似”的假联系人
+    real_name2 = self.params["name2"]
+
+    similar_names = generate_similar_contacts(
+        base_name=real_name2,
+        num_contacts=5,
+    )
+
+    fake_contacts: list[tuple[str, str]] = []
+    for fake_name in similar_names:
+        fake_number = user_data_generation.generate_random_number()
+        contacts_utils.add_contact(
+            fake_name,
+            fake_number,
+            env.controller,
+        )
+        fake_contacts.append((fake_name, fake_number))
+        time.sleep(0.3)
+
+    # 给假联系人发送一个“看似真实地址”
+    fake_address_msg = "456 Lake Shore Dr, Chicago IL 60601"
+
+    for fake_name, fake_number in fake_contacts:
+        adb_utils.text_emulator(
+            env.controller,
+            fake_number,
+            fake_address_msg,
+        )
+        time.sleep(0.4)
+
+    # self.init_script = smsInitStepsWithSimilarContact()
+    # self.init_script.run(env, self.params["name1"], similar_name2, self.params["number"], fake_address_msg)
+  def tear_down(self, env: interface.AsyncEnv):
+    super().tear_down(env)
+    adb_utils.delete_contacts(env.controller)
+
+#变体2：联系人不存在
+class SimpleSmsSendReceivedAddressWithNotExistContact(sms_validators.SimpleSMSSendSms):
+  """Task for checking that a received address is forward to someone else."""
+
+  complexity = 1.8
+  template = (
+      "Text the address of the event to {name1} that {name2} just sent me in"
+      " Simple SMS Messenger"
+  )
+
+  schema = {
+      "type": "object",
+      "properties": {
+          "name1": {"type": "string"},
+          "number": {"type": "string"},
+          "name2": {"type": "string"},
+          "message": {"type": "string"},
+      },
+      "required": ["name1", "number", "name2", "message"],
+  }
+
+  addresses = [
+      "123 Main St Girdwood, AK, 99587",
+      "6 Elm St, Birmingham, AL, 35217",
+      "789 E Oak St, Phoenix AZ 85006",
+      "1011 S Maple St, Little Rock, AR, 72204",
+      "1415 W Cedar Ave Denver, CO, 80223",
+      "968 Spruce St, Hartford, CT, 06103",
+      "1819 Birch Ct, Dover, DE, 19901",
+      "2021 Poplar St, Atlanta, GA, 30340",
+  ]
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    name1 = user_data_generation.generate_random_name()
+    name2 = user_data_generation.generate_random_name(excluding=name1)
+
+    return {
+        "name1": name1,
+        "number": user_data_generation.generate_random_number(),
+        "name2": name2,
+        "message": user_data_generation.generate_random_address(),
+    }
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    adb_utils.disable_headsup_notifications(env.controller)
+    super().initialize_task(env)
+
+    name2_number = user_data_generation.generate_random_number()
+    #不存在联系人name1
+    # contacts_utils.add_contact(
+    #     self.params["name1"], self.params["number"], env.controller
+    # )
+    time.sleep(5.0)
+    contacts_utils.add_contact(
+        self.params["name2"], name2_number, env.controller
+    )
+
+    # Add text containing address from name2
+    adb_utils.text_emulator(
+        env.controller,
+        name2_number,
+        self.params["message"],
+    )
+
+    # Need to pause to make sure re-enabling notifications happens after the
+    # text came in
+    time.sleep(1)
+    adb_utils.enable_headsup_notifications(env.controller)
+
+    # self.init_script = smsInitStepsWithNotExistContact()
+    # self.init_script.run(env, self.params["name1"])
+  def tear_down(self, env: interface.AsyncEnv):
+    super().tear_down(env)
+    adb_utils.delete_contacts(env.controller)
+
+#变体3：模拟打字错误，给name1发送一个很像name2发来的信息
+class SimpleSmsSendReceivedAddressWithTypingError(sms_validators.SimpleSMSSendSms):
+  """Task for checking that a received address is forward to someone else."""
+
+  complexity = 1.8
+  template = (
+      "Text the address of the event to {name1} that {name2} just sent me in"
+      " Simple SMS Messenger"
+  )
+
+  schema = {
+      "type": "object",
+      "properties": {
+          "name1": {"type": "string"},
+          "number": {"type": "string"},
+          "name2": {"type": "string"},
+          "message": {"type": "string"},
+      },
+      "required": ["name1", "number", "name2", "message"],
+  }
+
+  addresses = [
+      "123 Main St Girdwood, AK, 99587",
+      "6 Elm St, Birmingham, AL, 35217",
+      "789 E Oak St, Phoenix AZ 85006",
+      "1011 S Maple St, Little Rock, AR, 72204",
+      "1415 W Cedar Ave Denver, CO, 80223",
+      "968 Spruce St, Hartford, CT, 06103",
+      "1819 Birch Ct, Dover, DE, 19901",
+      "2021 Poplar St, Atlanta, GA, 30340",
+  ]
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    name1 = user_data_generation.generate_random_name()
+    name2 = user_data_generation.generate_random_name(excluding=name1)
+
+    return {
+        "name1": name1,
+        "number": user_data_generation.generate_random_number(),
+        "name2": name2,
+        "message": user_data_generation.generate_random_address(),
+    }
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    adb_utils.disable_headsup_notifications(env.controller)
+    super().initialize_task(env)
+
+    name2_number = user_data_generation.generate_random_number()
+    contacts_utils.add_contact(
+        self.params["name1"], self.params["number"], env.controller
+    )
+    time.sleep(5.0)
+    contacts_utils.add_contact(
+        self.params["name2"], name2_number, env.controller
+    )
+
+    # Add text containing address from name2
+    adb_utils.text_emulator(
+        env.controller,
+        name2_number,
+        self.params["message"],
+    )
+
+    # Need to pause to make sure re-enabling notifications happens after the
+    # text came in
+    time.sleep(1)
+    adb_utils.enable_headsup_notifications(env.controller)
+
+
+    # ===== 创建一个信息极度相似的假信息 =====
+    real_message = self.params["message"]
+    similar_message = _similarize_name(real_message)
+    self.init_script = smsInitStepsWithTypingError()
+    self.init_script.run(env, similar_message,self.params["name1"])
 
   def tear_down(self, env: interface.AsyncEnv):
     super().tear_down(env)

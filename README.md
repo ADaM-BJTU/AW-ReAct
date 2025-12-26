@@ -1,213 +1,254 @@
-# AndroidWorld
+# 🧠 AW-ReAct
 
-<!-- mdlint off(WHITESPACE_LINE_LENGTH) -->
+**A Reflection-Oriented Benchmark Built on AndroidWorld**
 
-[![Unittests](https://github.com/google-research/android_world/actions/workflows/pytest.yml/badge.svg)](https://github.com/google-research/android_world/actions/workflows/pytest.yml)
+> A benchmark for evaluating agent robustness under imperfect instructions, environment inconsistencies, and human-like errors.
 
-<p align="center">
-<a href="https://google-research.github.io/android_world/">Website</a> •
-<a href="https://arxiv.org/pdf/2405.14573">Paper</a> •
-<a href="https://google-research.github.io/android_world/task_list.html">Tasks</a> •
-<a href="https://docs.google.com/spreadsheets/d/1cchzP9dlTZ3WXQTfYNhh3avxoLipqHN75v1Tb86uhHo/edit?gid=0#gid=0">Leaderboard</a>
-</p>
+------
 
-![Overview](assets/overview.png)
+## 📌 项目简介
 
-**AndroidWorld** is an environment for building and benchmarking autonomous
-computer control agents.
+近年来，基于大模型的移动端智能体在 **AndroidWorld** 等基准上取得了显著进展。然而，现有评测任务大多假设：
 
-It runs on a live Android emulator and contains a highly reproducible benchmark
-of 116 hand-crafted tasks across 20 apps, which are dynamically instantiated
-with randomly-generated parameters to create millions of unique task variations.
+- 用户指令是 **完美的**
+- 初始环境是 **干净且一致的**
+- 执行过程中 **不会出现人类常见错误**
 
-In addition to the built-in tasks, AndroidWorld also supports the popular web benchmark, MiniWoB++ from [Liu et al.](http://arxiv.org/abs/1802.08802).
+这与真实世界中的人机交互存在明显差距。
 
-Key features of AndroidWorld include:
+**本项目提出一个“反思导向”的 AndroidWorld 扩展 Benchmark**，通过在**不改变任务目标本身**的前提下，引入**系统性、可控的任务扰动**，评测 Agent 在以下情形下的能力：
 
-* 📝 **116 diverse tasks** across 20 real-world apps
-* 🎲 **Dynamic task instantiation** for millions of unique variations
-* 🏆 **Durable reward signals** for reliable evaluation
-* 🐳 **Experimental Docker Support** for simplified setup and consistent environments (as of 06/02/2025)
-* 🌐 **Open environment** with access to millions of Android apps and websites
-* 💾 **Lightweight footprint** (2 GB memory, 8 GB disk)
-* 🔧 **Extensible design** to easily add new tasks and benchmarks
-* 🖥️ **Integration with MiniWoB++** web-based tasks
+- 面对 **错误输入**
+- 面对 **环境初始化异常**
+- 面对 **误导信息与相似干扰**
+- 是否具备 **发现问题 → 停止 → 修正策略** 的能力
 
-See demo videos on our [website](https://google-research.github.io/android_world/).
-o
+------
 
-## Installation
+## 🎯 设计目标
 
-1. Set up the Android Emulator
-   1. Download Android Studio [here](https://developer.android.com/studio?gad_source=1&gclid=Cj0KCQjw3ZayBhDRARIsAPWzx8oLcadBD0vAq8xmUutaunLGSzhgEtLz4xVZ_SpV4G0xJazS7LxQkDsaAuveEALw_wcB&gclsrc=aw.ds)
-   2. Create an Android Virtual Device (AVD) by following these instructions. For hardware select **Pixel 6**, for System Image select **Tiramisu, API Level 33**, and choose AVD name as **AndroidWorldAvd**. [Watch the setup video.](https://github.com/google-research/android_world/assets/162379927/efc33980-8b36-44be-bb2b-a92d4c334a50)
+本 Benchmark 的核心目标包括：
 
-1. Launch the Android Emulator from the command line
+1. **保持任务目标不变**
 
-    Launch the emulator from the command line, not using the Android Studio UI,
-    with the `-grpc 8554` flag which is needed communication with accessibility
-    forwarding app.
+   > 扰动的是 **执行路径**，不是 **任务本身**
 
-    ```bash
-    # Typically it's located in ~/Android/Sdk/emulator/emulator or
-    # ~/Library/Android/sdk/emulator/emulator
-    EMULATOR_NAME=AndroidWorldAvd # From previous step
-    ~/Library/Android/sdk/emulator/emulator -avd $EMULATOR_NAME -no-snapshot -grpc 8554
-    ```
+2. **扰动可解释、可复现**
 
-1. [Optional] It's recommended to use `conda`, which you can download [here](https://docs.anaconda.com/free/miniconda/miniconda-install/).
+   - 每个任务变体只引入 **单一反思维度**
+   - 不组合扰动，避免因果混淆
 
-    ```
-    conda create -n android_world python=3.11.8
-    conda activate android_world
-    ```
+3. **对主流 Agent 具有区分度**
 
-1. Install AndroidWorld. *Note: Python 3.11 or above is required.*
+   - 基础任务：Mobile-Agent-V3 ≈ 60% 成功率
+   - 扰动后任务：显著拉开差距
 
-    ```python
-    git clone https://github.com/google-research/android_world.git
-    cd ./android_world
-    pip install -r requirements.txt
-    python setup.py install
-    ```
+4. **最小侵入式改造 AndroidWorld**
 
-1. Add model provider APIs as environment variables.
+   - 复用原始 Task / Validator / Env
+   - 扰动集中在 `initialize_task` 或 action 层
 
-    ```bash
-    # Add to .bashrc.
-    export OPENAI_API_KEY=your-key
-    export GCP_API_KEY=your-key
-    ```
+------
 
-1. Install `ffmpeg`, if not already installed.
+## 🧩 扰动类型定义
 
-    ```bash
-    # Linux (Ubuntu/Debian)
-    # sudo apt update && sudo apt install ffmpeg
+当前版本 **不组合扰动**，每个任务只包含一种反思维度：
 
-    # macOS
-    brew install ffmpeg
-    ```
+### 1️⃣ Typing Error
 
-## Quickstart
+模拟真实用户常见输入错误：
 
-Run the `minimal_task_runner.py` script to see the basic mechanics of
-AndroidWorld components. It initializes the environment, sets up a task, and
-runs the default agent, M3A, on it.
-```bash
-python minimal_task_runner.py --task=ContactsAddContact
+- 少打一个字符
+- 多打一个空格
+- 相似字符替换（l / 1 / I）
+
+📌 重点考察：
+
+> Agent 是否能意识到「输入结果不符合语义预期」
+
+------
+
+### 2️⃣ Non-existent Target
+
+任务开始前，**目标对象已被删除或从未存在**：
+
+- 文件不存在
+- 笔记不存在
+- 目标文件夹不存在
+
+📌 重点考察：
+
+> Agent 是否会盲目执行，还是先检查前置条件
+
+------
+
+### 3️⃣ Similar / Misleading Information
+
+环境中存在多个**高度相似但非目标对象**：
+
+- 相似联系人名
+- 相似文件名
+- 相似文件夹
+
+📌 重点考察：
+
+> Agent 是否具备精确匹配与信息溯源能力
+
+------
+
+## 📱 任务来源与覆盖 App
+
+当前任务全部来源于 **AndroidWorld 原生任务**，覆盖以下高频 App 场景：
+
+| App                  | 场景类型                      |
+| -------------------- | ----------------------------- |
+| Simple SMS Messenger | 信息发送 / 回复 / 转发        |
+| Markor               | 笔记创建 / 删除 / 移动 / 编辑 |
+| Files                | 文件删除 / 移动               |
+| Retro Music          | 播放列表管理                  |
+| Audio Recorder       | 录音与文件命名                |
+
+------
+
+## 🧪 任务清单（Task List）
+
+### 📩 SMS（Simple SMS Messenger）
+
+#### `SimpleSmsSendReceivedAddress`
+
+| 变体                | 扰动类型   | 描述                         |
+| ------------------- | ---------- | ---------------------------- |
+| WithSimilarContact  | 相似干扰   | 存在多个名字极度相似的联系人 |
+| WithNotExistContact | 目标不存在 | 目标联系人不存在             |
+| WithTypingError     | 打字错误   | 转发内容存在拼写错误         |
+
+------
+
+### 🎙 Audio Recorder
+
+#### `AudioRecorderRecordAudioWithFileName`
+
+| 变体            | 扰动类型 | 描述               |
+| --------------- | -------- | ------------------ |
+| WithTypingError | 打字错误 | 录音文件名输入错误 |
+
+------
+
+### 📝 Markor（Markdown Notes）
+
+#### `MarkorMoveNote`
+
+| 变体                          | 扰动类型   | 描述                         |
+| ----------------------------- | ---------- | ---------------------------- |
+| WithNotExistDestinationFolder | 目标不存在 | 目标文件夹在任务开始前被删除 |
+| WithSimilarFolders            | 相似干扰   | 存在多个相似文件夹           |
+
+------
+
+#### `MarkorCreateFolder`
+
+| 变体            | 扰动类型 | 描述                     |
+| --------------- | -------- | ------------------------ |
+| WithTypingError | 打字错误 | 创建文件夹时名称输入错误 |
+
+------
+
+#### `MarkorDeleteNote`
+
+| 变体             | 扰动类型   | 描述                   |
+| ---------------- | ---------- | ---------------------- |
+| WithNotExistNote | 目标不存在 | 目标笔记已被提前删除   |
+| WithSimilarNote  | 相似干扰   | 多个相似笔记混淆 Agent |
+
+------
+
+#### `MarkorCreateNote`
+
+| 变体                | 扰动类型 | 描述             |
+| ------------------- | -------- | ---------------- |
+| WithFileTypingError | 打字错误 | 文件名输入错误   |
+| WithTextTypingError | 打字错误 | 笔记正文内容错误 |
+
+------
+
+#### `MarkorChangeNoteContent`
+
+| 变体             | 扰动类型   | 描述             |
+| ---------------- | ---------- | ---------------- |
+| WithSimilarNote  | 相似干扰   | 多个相似笔记     |
+| WithTypingError  | 打字错误   | 编辑内容输入错误 |
+| WithNotExistNote | 目标不存在 | 笔记不存在       |
+
+------
+
+### 📂 Files
+
+#### `FilesDeleteFile`
+
+| 变体             | 扰动类型   | 描述         |
+| ---------------- | ---------- | ------------ |
+| WithSimilarFiles | 相似干扰   | 多个诱饵文件 |
+| WithNotExistFile | 目标不存在 | 文件不存在   |
+
+------
+
+#### `FilesMoveFile`
+
+| 变体             | 扰动类型   | 描述         |
+| ---------------- | ---------- | ------------ |
+| WithSimilarFiles | 相似干扰   | 多个相似文件 |
+| WithNotExistFile | 目标不存在 | 文件不存在   |
+
+------
+
+### 🎵 Retro Music
+
+#### `RetroCreatePlaylist`
+
+| 变体               | 扰动类型 | 描述                       |
+| ------------------ | -------- | -------------------------- |
+| WithTypingError    | 打字错误 | 歌单名拼写错误             |
+| WithSomeWrongSongs | 误导信息 | 已存在部分但错误的歌单内容 |
+
+------
+
+## 🧠 What We Measure
+
+本 Benchmark **关心任务是否完成**的同时，重点分析：
+
+- 是否 **发现异常**
+- 是否 **重复错误行为**
+- 是否 **调整策略**
+- 是否 **主动修正输入或路径**
+
+可用于分析：
+
+- ReAct / Reflexion / Tool-Calling Agent
+- Mobile-Agent-V3 / GUI-Owl / AppAgent 等
+
+------
+
+## 🚀 Usage
+
+```
+# 示例
+python run_ma3.py \
+  --suite_family=andriod_world \
+  --agent_name=mobile_agent_v3 \
+  --task SimpleSmsSendReceivedAddressWithTypingError
 ```
 
-If you don't specify a task, a random task will be selected. *NOTE: If you want
-to try open-source apps, i.e. not included with Android OS, please run
-`--perform_emulator_setup` in the script below.*
+支持：
 
-## Docker Support (Experimental)
+- 单任务 / 批量任务
+- 与原 AndroidWorld 评测脚本兼容
 
-AndroidWorld now offers Docker support. This allows you to run the Android
-environment and server within a Docker container, which can simplify setup and
-ensure a consistent environment.
+------
 
-**Note:** This feature is experimental and has not been extensively tested.
+## 🔮 Future Work
 
-1.  **Build the Docker image:**
+- ⏳ 组合扰动
+- 📊 错误类型级别的成功率分析
+- 🤖 扩展其他扰动类型
 
-    Navigate to the root directory of the `android_world` repository and run:
-    ```bash
-    docker build -t android_world:latest .
-    ```
-
-2.  **Run the Docker container:**
-    ```bash
-    docker run --privileged -p 5000:5000 -it android_world:latest
-    ```
-    This will start the Android emulator and the FastAPI server inside the
-    container. The server will be accessible on `http://localhost:5000`.
-
-3.  **Interact with the environment:**
-    You can see the `scripts/run_suite_on_docker.py` script as an example client
-    to interact with the Android environment server running in Docker.
-
-### Note for Apple Silicon users
-
-There are known [issues](https://github.com/amrsa1/Android-Emulator-image/issues/10) with installing the required package `emulator` on ARM chips (Apple Silicon). To get around this, if building images locally, you should build images for the AMD64/x86_64 instruction set, by running:
-```bash
-docker buildx build --platform linux/amd64 -t android-emulator:latest .
-```
-
-Note, running in a Docker container like this, on an Apple Silicon device will run quite slowly compared to running the Android
-Device and Emulator natively (because you end up running an Android Emulator inside a Linux Emulator...).
-
-## Run the benchmark
-
-Note: **Task Step Limits Update**
-As of 11/18/2024, the max_steps/step_budget for each task in AndroidWorld have been updated to approximately **2x the human average completion time**. This adjustment ensures agents have sufficient time to complete tasks, while also reducing overhead of running thebenchmark. [Here](https://docs.google.com/spreadsheets/d/1KF-vY0Uy47o0mnursvs-HmS6hreU6U3rPrAjgEfjMK4/edit?usp=sharing) are the per-task updates.
-
-```bash
-python run.py \
-  --suite_family=android_world \
-  --agent_name=t3a_gpt4 \
-  --perform_emulator_setup \
-  --tasks=ContactsAddContact,ClockStopWatchRunning \  # Optional: Just run on a subset.
-```
-
-The first time you run this script, you must install the necessary apps and set
-permissions by specifying `--perform_emulator_setup`. This is a one-time setup.
-It may take several minutes depending on the connection speed.
-
-Above we specify the optional `--tasks` flag to run on a subset of tasks. Leave
-it empty to run on the entire AndroidWorld suite.
-
-The `n_task_combinations` argument specifies how many parameter permutations to
-use for each task. For example, for an SMS task, it would correspond to
-different phone number/message combinations for each run.
-
-If a run fails part-way through, you can resume it by re-running the script with
-the `--checkpoint_dir` flag pointing to the output directory from the original
-run.
-
-## Running MiniWoB++ tasks
-
-To run the MiniWoB++ web-based tasks in AndroidWorld, simply set
-`--suite_family=miniwob` and `--perform_emulator_setup` in the command above.
-
-A key advantage of running MiniWoB++ tasks is that common input elements are
-rendered as native, commonly used Android UI widgets, rather than as HTML. Thus
-agents must learn to use universal widgets such as time- and date-pickers:
-
-<p align="center">
-   <img src="assets/miniwob.png" style="width:30%">
-</p>
-
-## Create your own agent
-
-In addition to the agents we provide [here](https://github.com/google-research/android_world/tree/main/android_world/agents), you can also easily create your own agent and run the benchmark with it as follows.
-
-1. Create an agent class that inherits from [EnvironmentInteractingAgent](https://github.com/google-research/android_world/blob/6e4feb00702735c9a7485f4ae714528a058cb2b7/android_world/agents/base_agent.py#L39C1-L39C44) and implement the [step](https://github.com/google-research/android_world/blob/6e4feb00702735c9a7485f4ae714528a058cb2b7/android_world/agents/base_agent.py#L116) method.
-In the current workflow, the agent tries to complete a task in a for loop. In each round, the [step](https://github.com/google-research/android_world/blob/6e4feb00702735c9a7485f4ae714528a058cb2b7/android_world/agents/base_agent.py#L116) method will be called and this is where you implement your agent's logic. A typical approach involves first gathering information like the current screenshot, the UI elements (like buttons, icons) through the AndroidEnv instance within the agent, selecting one of the [supported actions](https://github.com/google-research/android_world/blob/main/android_world/env/json_action.py), executing it through the AndroidEnv and returning an [AgentInteractionResult](https://github.com/google-research/android_world/blob/6e4feb00702735c9a7485f4ae714528a058cb2b7/android_world/agents/base_agent.py#L26). The `done` property on AgentInteractionResult should be set to true to indicate that the task is finished.
-
-2. Import your agent in [run.py](https://github.com/google-research/android_world/blob/main/run.py) and also add it into the [_get_agent](https://github.com/google-research/android_world/blob/15471441ac306ff08bca87454b1b546ae81db7af/run.py#L147) method which takes in your agent's name and return an instance of it.
-
-3. Now you can run the benchmark with your new agent using the command above with the `agent_name` flag changed to your agent's name.
-
-## Adding new tasks
-
-Please see [the guide](https://github.com/google-research/android_world/blob/main/docs/tasks_guide.md) on adding new tasks to AndroidWorld.
-
-## Citation
-
-If you use our environment or data, please cite our paper:
-
-```
-@misc{rawles2024androidworlddynamicbenchmarkingenvironment,
-      title={AndroidWorld: A Dynamic Benchmarking Environment for Autonomous Agents},
-      author={Christopher Rawles and Sarah Clinckemaillie and Yifan Chang and Jonathan Waltz and Gabrielle Lau and Marybeth Fair and Alice Li and William Bishop and Wei Li and Folawiyo Campbell-Ajala and Daniel Toyama and Robert Berry and Divya Tyamagundlu and Timothy Lillicrap and Oriana Riva},
-      year={2024},
-      eprint={2405.14573},
-      archivePrefix={arXiv},
-      primaryClass={cs.AI},
-      url={https://arxiv.org/abs/2405.14573},
-}
-```
-
-*This is not an officially supported Google product.*
+------

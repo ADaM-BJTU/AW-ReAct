@@ -1,0 +1,86 @@
+[
+  {
+    "timestamp": 23.775734663009644,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(11468,29626) → 屏幕:(377,2169))",
+    "x": 377,
+    "y": 2169,
+    "raw_x": 11468,
+    "raw_y": 29626,
+    "element": {
+      "index": 44,
+      "text": null,
+      "content_description": "Emoji button",
+      "class_name": "android.widget.FrameLayout",
+      "bbox": {
+        "x_min": 272,
+        "x_max": 379,
+        "y_min": 2118,
+        "y_max": 2274
+      }
+    },
+    "text_key": "element_44"
+  },
+  {
+    "timestamp": 23.7863667011261,
+    "action_type": "input_text",
+    "step_desc": "输入文本camera\n",
+    "text": "camera"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待6.16秒",
+    "duration": 6.16,
+    "timestamp": 23.7863667011261
+  },
+  {
+    "timestamp": 29.9477596282959,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(4733,5911) → 屏幕:(155,432))",
+    "x": 155,
+    "y": 432,
+    "raw_x": 4733,
+    "raw_y": 5911,
+    "element": {
+      "index": 0,
+      "text": null,
+      "content_description": null,
+      "class_name": "android.view.View",
+      "bbox": {
+        "x_min": 0,
+        "x_max": 1080,
+        "y_min": 128,
+        "y_max": 2337
+      }
+    },
+    "text_key": "element_0"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待4.68秒",
+    "duration": 4.68,
+    "timestamp": 29.9477596282959
+  },
+  {
+    "timestamp": 34.63027262687683,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(3398,2757) → 屏幕:(111,201))",
+    "x": 111,
+    "y": 201,
+    "raw_x": 3398,
+    "raw_y": 2757,
+    "element": {
+      "index": 0,
+      "text": null,
+      "content_description": null,
+      "class_name": "android.view.View",
+      "bbox": {
+        "x_min": 0,
+        "x_max": 1080,
+        "y_min": 128,
+        "y_max": 2337
+      }
+    },
+    "text_key": "element_0"
+  }
+]

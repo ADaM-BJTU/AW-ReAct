@@ -1,0 +1,159 @@
+[
+  {
+    "timestamp": 5.433333396911621,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(18628,30077) → 屏幕:(613,2202))",
+    "x": 613,
+    "y": 2202,
+    "raw_x": 18628,
+    "raw_y": 30077,
+    "element": null,
+    "text_key": "unknown"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待5.18秒",
+    "duration": 5.18,
+    "timestamp": 5.433333396911621
+  },
+  {
+    "timestamp": 10.612972497940063,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(24575,3167) → 屏幕:(809,231))",
+    "x": 809,
+    "y": 231,
+    "raw_x": 24575,
+    "raw_y": 3167,
+    "element": {
+      "index": 1,
+      "text": "CAMERA",
+      "content_description": null,
+      "class_name": "android.widget.EditText",
+      "bbox": {
+        "x_min": 214,
+        "x_max": 886,
+        "y_min": 156,
+        "y_max": 301
+      }
+    },
+    "text_key": "camera"
+  },
+  {
+    "timestamp": 10.627108335494995,
+    "action_type": "input_text",
+    "step_desc": "输入文本camera\n",
+    "text": "camera"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待7.55秒",
+    "duration": 7.55,
+    "timestamp": 10.627108335494995
+  },
+  {
+    "timestamp": 18.174198389053345,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(3580,5870) → 屏幕:(117,429))",
+    "x": 117,
+    "y": 429,
+    "raw_x": 3580,
+    "raw_y": 5870,
+    "element": {
+      "index": 0,
+      "text": null,
+      "content_description": null,
+      "class_name": "android.view.View",
+      "bbox": {
+        "x_min": 0,
+        "x_max": 1080,
+        "y_min": 128,
+        "y_max": 2337
+      }
+    },
+    "text_key": "element_0"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待4.86秒",
+    "duration": 4.86,
+    "timestamp": 18.174198389053345
+  },
+  {
+    "timestamp": 23.035518407821655,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(3033,2839) → 屏幕:(99,207))",
+    "x": 99,
+    "y": 207,
+    "raw_x": 3033,
+    "raw_y": 2839,
+    "element": {
+      "index": 0,
+      "text": null,
+      "content_description": null,
+      "class_name": "android.view.View",
+      "bbox": {
+        "x_min": 0,
+        "x_max": 1080,
+        "y_min": 128,
+        "y_max": 2337
+      }
+    },
+    "text_key": "element_0"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待2.71秒",
+    "duration": 2.71,
+    "timestamp": 23.035518407821655
+  },
+  {
+    "timestamp": 25.74498748779297,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(3944,18499) → 屏幕:(129,1354))",
+    "x": 129,
+    "y": 1354,
+    "raw_x": 3944,
+    "raw_y": 18499,
+    "element": {
+      "index": 0,
+      "text": null,
+      "content_description": null,
+      "class_name": "android.view.View",
+      "bbox": {
+        "x_min": 0,
+        "x_max": 1080,
+        "y_min": 128,
+        "y_max": 2337
+      }
+    },
+    "text_key": "element_0"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待1.18秒",
+    "duration": 1.18,
+    "timestamp": 25.74498748779297
+  },
+  {
+    "timestamp": 26.92850947380066,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(15958,30118) → 屏幕:(525,2205))",
+    "x": 525,
+    "y": 2205,
+    "raw_x": 15958,
+    "raw_y": 30118,
+    "element": {
+      "index": 0,
+      "text": null,
+      "content_description": null,
+      "class_name": "android.view.View",
+      "bbox": {
+        "x_min": 0,
+        "x_max": 1080,
+        "y_min": 128,
+        "y_max": 2337
+      }
+    },
+    "text_key": "element_0"
+  }
+]

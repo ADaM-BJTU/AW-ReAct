@@ -53,7 +53,7 @@ class State:
   pixels: np.ndarray
   forest: Any
   ui_elements: list[representation_utils.UIElement]
-  auxiliaries: dict[str, Any] | None = None
+  auxiliaries: Optional[dict[str, Any]] = None
 
   @classmethod
   def create_and_infer_elements(
@@ -117,7 +117,7 @@ class AsyncEnv(abc.ABC):
   @abc.abstractmethod
   def ask_question(
       self, question: str, timeout_seconds: float = -1.0
-  ) -> str | None:
+  ) -> Optional[str]:
     """Asks a question to a hypothetical user in the environment.
 
     Common uses are to ask a question to clarify the user-provided goal, to ask
@@ -327,7 +327,7 @@ class AsyncAndroidEnv(AsyncEnv):
 
   def ask_question(
       self, question: str, timeout_seconds: float = -1.0
-  ) -> str | None:
+  ) -> Optional[str]:
     raise NotImplementedError('ask_question is not implemented.')
 
   @property

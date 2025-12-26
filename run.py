@@ -23,6 +23,9 @@ command-line flags.
 from collections.abc import Sequence
 import os
 
+from pydub import AudioSegment
+AudioSegment.converter = r"E:\AppData\ffmpeg-8.0.1-essentials_build\bin\ffmpeg.exe"
+
 from absl import app
 from absl import flags
 from absl import logging
@@ -48,12 +51,14 @@ os.environ['GRPC_TRACE'] = 'none'  # Disable tracing
 def _find_adb_directory() -> str:
   """Returns the directory where adb is located."""
   potential_paths = [
-      os.path.expanduser('~/Library/Android/sdk/platform-tools/adb'),
-      os.path.expanduser('~/Android/Sdk/platform-tools/adb'),
+      os.path.expanduser('~/Library/Android/sdk/platform-tools/adb.exe'),
+      os.path.expanduser('~/Android/Sdk/platform-tools/adb.exe'),
+      os.path.expanduser('C:\\Users\\dell\\AppData\\Local\\Android\\Sdk\\platform-tools\\adb.exe'),
   ]
   for path in potential_paths:
     if os.path.isfile(path):
       return path
+
   raise EnvironmentError(
       'adb not found in the common Android SDK paths. Please install Android'
       " SDK and ensure adb is in one of the expected directories. If it's"
@@ -179,6 +184,15 @@ def _get_agent(
   elif _AGENT_NAME.value == 'seeact':
     agent = seeact.SeeAct(env)
 
+  elif _AGENT_NAME.value == 'my_agent':
+    from android_world.agents.my_agent import create_agent
+    agent = create_agent(env)
+
+  elif _AGENT_NAME.value == "mobile_agent_v3":
+    from android_world.agents.mobile_agent_v3 import MobileAgentV3
+    agent = MobileAgentV3(env)
+
+  # ------------------------------
   if not agent:
     raise ValueError(f'Unknown agent: {_AGENT_NAME.value}')
 
@@ -250,3 +264,9 @@ def main(argv: Sequence[str]) -> None:
 
 if __name__ == '__main__':
   app.run(main)
+
+#C:\Users\dell\AppData\Local\Android\Sdk\emulator
+#set EMULATOR_NAME=AndroidWorldAvd
+#emulator.exe -avd %EMULATOR_NAME% -no-snapshot -grpc 8554
+#python run.py --suite_family=android_world --agent_name=human_agent --perform_emulator_setup --tasks=TurnOnWifiAndOpenApp
+#python run.py --suite_family=android_world --agent_name=human_agent  --tasks=RetroCreatePlaylist

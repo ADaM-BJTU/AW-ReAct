@@ -16,6 +16,7 @@
 
 import dataclasses
 import datetime
+import os
 import random
 from typing import Any
 
@@ -25,13 +26,17 @@ from android_world.env import device_constants
 from android_world.env import interface
 from android_world.task_evals import task_eval
 from android_world.task_evals.common_validators import file_validators
+from android_world.task_evals.similarize_name import generate_similar_contacts, _similarize_name, _similarize_name_multi
 from android_world.task_evals.single import vlc
+from android_world.task_evals.single.markor_init_steps import MarkorInitStepsWithNotExistDestinationFolder, \
+    MarkorCreateFolderInitStepsWithTypingError, MarkorDeleteNoteInitStepsWithNotExistNote, \
+    MarkorCreateNoteInitStepsWithFileTypingError, MarkorCreateNoteInitStepsWithTextTypingError, \
+    MarkorChangeNoteInitStepsWithTypingError, MarkorChangeNoteInitStepsWithNotExistNote
 from android_world.task_evals.utils import receipt_generator
 from android_world.task_evals.utils import user_data_generation
 from android_world.utils import datetime_utils
 from android_world.utils import file_utils
 from android_world.utils import fuzzy_match_lib
-
 
 @dataclasses.dataclass(frozen=True)
 class _Note:
@@ -82,10 +87,13 @@ class MarkorMoveNote(Markor):
     self.move_file_task = file_validators.MoveFile(
         params, device_constants.MARKOR_DATA
     )
+    #初始化独立脚本实例
+    self.init_script = MarkorInitStepsWithNotExistDestinationFolder()
 
   def initialize_task(self, env: interface.AsyncEnv) -> None:
     super().initialize_task(env)
     self.move_file_task.initialize_task(env)
+    self.init_script.run(env,self.params['destination_folder'])
 
   def is_successful(self, env: interface.AsyncEnv) -> float:
     super().is_successful(env)
@@ -962,3 +970,612 @@ _NOTE_TITLES = [
     "garden_layout_plan.md",
     "upcoming_presentation_outline.md",
 ]
+
+
+#新任务 从MarkorMoveNote任务下分
+
+#变体1：目的地文件夹不存在
+class MarkorMoveNoteWithNotExistDestinationFolder(Markor):
+  """Task for checking that a file has been moved in Markor."""
+
+  complexity = 1.4
+  schema = file_validators.MoveFile.schema
+  template = (
+      "In Markor, move the note {file_name} from {source_folder} to"
+      " {destination_folder}."
+  )
+
+  def __init__(self, params: dict[str, Any]):
+    """Initialize the task."""
+    super().__init__(params)
+    self.move_file_task = file_validators.MoveFile(
+        params, device_constants.MARKOR_DATA
+    )
+    #初始化独立脚本实例
+    self.init_script = MarkorInitStepsWithNotExistDestinationFolder()
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    self.move_file_task.initialize_task(env)
+    self.init_script.run(env,self.params['destination_folder'])
+
+  def is_successful(self, env: interface.AsyncEnv) -> float:
+    super().is_successful(env)
+    return self.move_file_task.is_successful(env)
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    subfolders = [
+        "BookNotes",
+        "CodeSnippets",
+        "DailyNotes",
+        "FitnessPlans",
+        "MeetingMinutes",
+        "PersonalJournal",
+        "RecipeCollections",
+        "StudyGuides",
+        "TravelItineraries",
+        "WorkProjects",
+    ]
+    source_folder = random.choice(subfolders)
+    destination_folder = random.choice(
+        [folder for folder in subfolders if folder != source_folder]
+    )
+    file_name = _generate_random_note().name
+    return {
+        "file_name": file_name,
+        "source_folder": source_folder,
+        "destination_folder": destination_folder,
+        "noise_candidates": _NOTE_TITLES,
+    }
+
+  def tear_down(self, env: interface.AsyncEnv) -> None:
+    super().tear_down(env)
+    self.move_file_task.tear_down(env)
+
+#变体2：创建多个相似的文件夹名字
+class MarkorMoveNoteWithSimilarFolders(Markor):
+  """Task for checking that a file has been moved in Markor."""
+
+  complexity = 1.4
+  schema = file_validators.MoveFile.schema
+  template = (
+      "In Markor, move the note {file_name} from {source_folder} to"
+      " {destination_folder}."
+  )
+
+  def __init__(self, params: dict[str, Any]):
+    """Initialize the task."""
+    super().__init__(params)
+    self.move_file_task = file_validators.MoveFile(
+        params, device_constants.MARKOR_DATA
+    )
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    self.move_file_task.initialize_task(env)
+    # 创建多个“极度相似”的假文件
+    real_file_name = self.params["file_name"]
+
+    similar_file_names = generate_similar_contacts(
+        base_name=real_file_name,
+        num_contacts=4,
+    )
+    source_dir = self.move_file_task.source_directory
+    for fake_name in similar_file_names:
+        file_utils.create_file(
+            fake_name, source_dir,env.controller
+        )
+
+  def is_successful(self, env: interface.AsyncEnv) -> float:
+    super().is_successful(env)
+    return self.move_file_task.is_successful(env)
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    subfolders = [
+        "BookNotes",
+        "CodeSnippets",
+        "DailyNotes",
+        "FitnessPlans",
+        "MeetingMinutes",
+        "PersonalJournal",
+        "RecipeCollections",
+        "StudyGuides",
+        "TravelItineraries",
+        "WorkProjects",
+    ]
+    source_folder = random.choice(subfolders)
+    destination_folder = random.choice(
+        [folder for folder in subfolders if folder != source_folder]
+    )
+    file_name = _generate_random_note().name
+    return {
+        "file_name": file_name,
+        "source_folder": source_folder,
+        "destination_folder": destination_folder,
+        "noise_candidates": _NOTE_TITLES,
+    }
+
+  def tear_down(self, env: interface.AsyncEnv) -> None:
+    super().tear_down(env)
+    self.move_file_task.tear_down(env)
+
+
+#新任务 从MarkorCreateNote任务下分
+
+#变体1：打字错误
+class MarkorCreateFolderWithTypingError(Markor):
+  """Task for checking that a new folder in Markor has been created with a specific name."""
+
+  complexity = 1
+  schema = {
+      "type": "object",
+      "properties": {
+          "folder_name": {"type": "string"},
+      },
+      "required": ["folder_name"],
+  }
+  template = "Create a new folder in Markor named {folder_name}."
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    user_data_generation.generate_noise_files(
+        "file",
+        device_constants.MARKOR_DATA,
+        env.controller,
+        _NOTE_TITLES,
+    )
+    #初始化独立脚本实例
+    self.init_script = MarkorCreateFolderInitStepsWithTypingError()
+    similar_name = _similarize_name(self.params["folder_name"])
+    self.init_script.run(env, similar_name)
+
+  def is_successful(self, env: interface.AsyncEnv) -> float:
+    super().is_successful(env)
+    folder_name = self.params["folder_name"]
+
+    exists = file_utils.check_file_or_folder_exists(
+        folder_name, device_constants.MARKOR_DATA, env.controller
+    )
+
+    if not exists:
+      logging.info("%s not found", folder_name)
+      return 0.0
+
+    return 1.0
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    random_folder_name = "folder_" + str(
+        datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    )
+    return {"folder_name": random_folder_name}
+
+#新任务 从MarkorDeleteNote任务下分
+#变体1：文件不存在
+class MarkorDeleteNoteWithNotExistNote(Markor):
+  """Task for checking that a note in Markor has been deleted."""
+
+  complexity = 1
+  schema = file_validators.DeleteFile.schema
+  template = "Delete the note in Markor named {file_name}."
+
+  def __init__(self, params: dict[str, Any]):
+    """Initialize the task."""
+    super().__init__(params)
+    self.delete_file_task = file_validators.DeleteFile(
+        params, device_constants.MARKOR_DATA
+    )
+    #初始化独立脚本实例
+    self.init_script = MarkorDeleteNoteInitStepsWithNotExistNote()
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    self.delete_file_task.initialize_task(env)
+    self.init_script.run(env,self.params["file_name"])
+  def is_successful(self, env: interface.AsyncEnv) -> float:
+    super().is_successful(env)
+    return self.delete_file_task.is_successful(env)
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    file_name = user_data_generation.generate_random_file_name()
+    return {"file_name": file_name, "noise_candidates": _NOTE_TITLES}
+
+  def tear_down(self, env: interface.AsyncEnv) -> None:
+    super().tear_down(env)
+    self.delete_file_task.tear_down(env)
+
+#变体2：多个混淆文件干扰
+class MarkorDeleteNoteWithSimilarNote(Markor):
+  """Task for checking that a note in Markor has been deleted."""
+
+  complexity = 1
+  schema = file_validators.DeleteFile.schema
+  template = "Delete the note in Markor named {file_name}."
+
+  def __init__(self, params: dict[str, Any]):
+    """Initialize the task."""
+    super().__init__(params)
+    self.delete_file_task = file_validators.DeleteFile(
+        params, device_constants.MARKOR_DATA
+    )
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    self.delete_file_task.initialize_task(env)
+    # 创建多个“极度相似”的假文件
+    real_file_name = self.params["file_name"]
+
+    similar_file_names = generate_similar_contacts(
+        base_name=real_file_name,
+        num_contacts=4,
+    )
+    source_dir = self.delete_file_task.data_directory
+    for fake_name in similar_file_names:
+        file_utils.create_file(
+            fake_name, source_dir,env.controller
+        )
+
+  def is_successful(self, env: interface.AsyncEnv) -> float:
+    super().is_successful(env)
+    return self.delete_file_task.is_successful(env)
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    file_name = user_data_generation.generate_random_file_name()
+    return {"file_name": file_name, "noise_candidates": _NOTE_TITLES}
+
+  def tear_down(self, env: interface.AsyncEnv) -> None:
+    super().tear_down(env)
+    self.delete_file_task.tear_down(env)
+
+#新任务 从MarkorCreateNote任务下分
+#变体1：文件名打错
+class MarkorCreateNoteWithFileTypingError(Markor):
+  """Task for checking that a new note in Markor has been created with a specific name and text."""
+
+  app_names = ("markor",)
+  complexity = 1.6
+  schema = file_validators.CreateFile.schema
+  template = (
+      "Create a new note in Markor named {file_name} with the following text:"
+      " {text}"
+  )
+
+  def __init__(self, params: dict[str, Any]):
+    """See base class."""
+    super().__init__(params)
+
+    self.create_file_task = file_validators.CreateFile(
+        params, device_constants.MARKOR_DATA
+    )
+    #初始化独立脚本实例
+    self.init_script = MarkorCreateNoteInitStepsWithFileTypingError()
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    self.create_file_task.initialize_task(env)  # Delegate
+    file_name = os.path.splitext(self.params["file_name"])[0]
+    similar_name = _similarize_name(file_name)
+    self.init_script.run(env,similar_name)
+
+  def is_successful(self, env: interface.AsyncEnv) -> float:
+    super().is_successful(env)
+    return self.create_file_task.is_successful(env)  # Delegate
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    note = _generate_random_note()
+    return {"file_name": note.name, "text": note.content}
+
+  def tear_down(self, env: interface.AsyncEnv) -> None:
+    super().tear_down(env)
+    self.create_file_task.tear_down(env)
+
+#变体2：文件内容打错
+class MarkorCreateNoteWithTextTypingError(Markor):
+  """Task for checking that a new note in Markor has been created with a specific name and text."""
+
+  app_names = ("markor",)
+  complexity = 1.6
+  schema = file_validators.CreateFile.schema
+  template = (
+      "Create a new note in Markor named {file_name} with the following text:"
+      " {text}"
+  )
+
+  def __init__(self, params: dict[str, Any]):
+    """See base class."""
+    super().__init__(params)
+
+    self.create_file_task = file_validators.CreateFile(
+        params, device_constants.MARKOR_DATA
+    )
+    #初始化独立脚本实例
+    self.init_script = MarkorCreateNoteInitStepsWithTextTypingError()
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    self.create_file_task.initialize_task(env)  # Delegate
+    file_name = os.path.splitext(self.params["file_name"])[0]
+    similar_text = _similarize_name_multi(self.params["text"])
+    self.init_script.run(env,file_name,similar_text)
+
+  def is_successful(self, env: interface.AsyncEnv) -> float:
+    super().is_successful(env)
+    return self.create_file_task.is_successful(env)  # Delegate
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    note = _generate_random_note()
+    return {"file_name": note.name, "text": note.content}
+
+  def tear_down(self, env: interface.AsyncEnv) -> None:
+    super().tear_down(env)
+    self.create_file_task.tear_down(env)
+
+
+#新任务 从MarkorChangeNoteContent任务下分
+#变体1：多个混淆文件干扰
+class MarkorChangeNoteContentWithSimilarNote(Markor):
+  """Task for changing an existing note's content and renaming it."""
+
+  complexity = 1.2
+  schema = {
+      "type": "object",
+      "properties": {
+          "original_name": {"type": "string"},
+          "new_name": {"type": "string"},
+          "updated_content": {"type": "string"},
+      },
+      "required": ["original_name", "new_name", "updated_content"],
+  }
+  template = (
+      'Update the content of {original_name} to "{updated_content}" in Markor'
+      " and change its name to {new_name}."
+  )
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    file_utils.create_file(
+        self.params["original_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+        content=user_data_generation.generate_random_string(20),
+    )
+    user_data_generation.generate_noise_files(
+        self.params["original_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+        _NOTE_TITLES,
+    )
+    if not file_utils.check_file_or_folder_exists(
+        self.params["original_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+    ):
+      raise RuntimeError("Something went wrong, file not created correctly.")
+
+    # 创建多个“极度相似”的假文件
+    real_file_name = self.params["original_name"]
+
+    similar_file_names = generate_similar_contacts(
+        base_name=real_file_name,
+        num_contacts=4,
+    )
+    source_dir = device_constants.MARKOR_DATA
+    for fake_name in similar_file_names:
+        file_utils.create_file(
+            fake_name, source_dir,env.controller
+        )
+
+  def tear_down(self, env: interface.AsyncEnv) -> None:
+    super().tear_down(env)
+    file_utils.remove_single_file(
+        self.params["original_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+    )
+
+  def is_successful(self, env: interface.AsyncEnv) -> float:
+    super().is_successful(env)
+    if file_utils.check_file_or_folder_exists(
+        self.params["original_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+    ):
+      return 0.0
+    if not file_utils.check_file_or_folder_exists(
+        self.params["new_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+    ):
+      return 0.0
+    content_updated = file_utils.check_file_content(
+        file_utils.convert_to_posix_path(
+            device_constants.MARKOR_DATA, self.params["new_name"]
+        ),
+        self.params["updated_content"],
+        env.controller,
+    )
+    return 1.0 if content_updated else 0.0
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    original = _generate_random_note().name
+    new = _generate_random_note().name
+    return {
+        "original_name": original,
+        "new_name": new,
+        "updated_content": user_data_generation.generate_random_string(20),
+    }
+
+#变体2：打字错误
+class MarkorChangeNoteContentWithTypingError(Markor):
+  """Task for changing an existing note's content and renaming it."""
+
+  complexity = 1.2
+  schema = {
+      "type": "object",
+      "properties": {
+          "original_name": {"type": "string"},
+          "new_name": {"type": "string"},
+          "updated_content": {"type": "string"},
+      },
+      "required": ["original_name", "new_name", "updated_content"],
+  }
+  template = (
+      'Update the content of {original_name} to "{updated_content}" in Markor'
+      " and change its name to {new_name}."
+  )
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    file_utils.create_file(
+        self.params["original_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+        content=user_data_generation.generate_random_string(20),
+    )
+    user_data_generation.generate_noise_files(
+        self.params["original_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+        _NOTE_TITLES,
+    )
+    if not file_utils.check_file_or_folder_exists(
+        self.params["original_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+    ):
+      raise RuntimeError("Something went wrong, file not created correctly.")
+    # 初始化独立脚本实例
+    self.init_script = MarkorChangeNoteInitStepsWithTypingError()
+    file_name = os.path.splitext(self.params["new_name"])[0]
+    similar_name = _similarize_name(file_name)
+    self.init_script.run(env,self.params["original_name"],similar_name)
+
+  def tear_down(self, env: interface.AsyncEnv) -> None:
+    super().tear_down(env)
+    file_utils.remove_single_file(
+        self.params["original_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+    )
+
+  def is_successful(self, env: interface.AsyncEnv) -> float:
+    super().is_successful(env)
+    if file_utils.check_file_or_folder_exists(
+        self.params["original_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+    ):
+      return 0.0
+    if not file_utils.check_file_or_folder_exists(
+        self.params["new_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+    ):
+      return 0.0
+    content_updated = file_utils.check_file_content(
+        file_utils.convert_to_posix_path(
+            device_constants.MARKOR_DATA, self.params["new_name"]
+        ),
+        self.params["updated_content"],
+        env.controller,
+    )
+    return 1.0 if content_updated else 0.0
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    original = _generate_random_note().name
+    new = _generate_random_note().name
+    return {
+        "original_name": original,
+        "new_name": new,
+        "updated_content": user_data_generation.generate_random_string(20),
+    }
+
+#变体3：初始条件不足
+class MarkorChangeNoteContentWithNotExistNote(Markor):
+  """Task for changing an existing note's content and renaming it."""
+
+  complexity = 1.2
+  schema = {
+      "type": "object",
+      "properties": {
+          "original_name": {"type": "string"},
+          "new_name": {"type": "string"},
+          "updated_content": {"type": "string"},
+      },
+      "required": ["original_name", "new_name", "updated_content"],
+  }
+  template = (
+      'Update the content of {original_name} to "{updated_content}" in Markor'
+      " and change its name to {new_name}."
+  )
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    file_utils.create_file(
+        self.params["original_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+        content=user_data_generation.generate_random_string(20),
+    )
+    user_data_generation.generate_noise_files(
+        self.params["original_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+        _NOTE_TITLES,
+    )
+    if not file_utils.check_file_or_folder_exists(
+        self.params["original_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+    ):
+      raise RuntimeError("Something went wrong, file not created correctly.")
+    # 初始化独立脚本实例
+    self.init_script = MarkorChangeNoteInitStepsWithNotExistNote()
+    self.init_script.run(env,self.params["original_name"])
+
+  def tear_down(self, env: interface.AsyncEnv) -> None:
+    super().tear_down(env)
+    file_utils.remove_single_file(
+        self.params["original_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+    )
+
+  def is_successful(self, env: interface.AsyncEnv) -> float:
+    super().is_successful(env)
+    if file_utils.check_file_or_folder_exists(
+        self.params["original_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+    ):
+      return 0.0
+    if not file_utils.check_file_or_folder_exists(
+        self.params["new_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+    ):
+      return 0.0
+    content_updated = file_utils.check_file_content(
+        file_utils.convert_to_posix_path(
+            device_constants.MARKOR_DATA, self.params["new_name"]
+        ),
+        self.params["updated_content"],
+        env.controller,
+    )
+    return 1.0 if content_updated else 0.0
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    original = _generate_random_note().name
+    new = _generate_random_note().name
+    return {
+        "original_name": original,
+        "new_name": new,
+        "updated_content": user_data_generation.generate_random_string(20),
+    }

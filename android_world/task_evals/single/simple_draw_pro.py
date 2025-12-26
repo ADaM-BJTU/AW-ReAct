@@ -22,7 +22,7 @@ from android_world.task_evals import task_eval
 from android_world.task_evals.common_validators import file_validators
 from android_world.task_evals.utils import user_data_generation
 from android_world.utils import file_utils
-
+from android_world.task_evals.single.simple_draw_pro_init_steps import DrawInitSteps
 
 class SimpleDrawProCreateDrawing(task_eval.TaskEval):
   """Task for checking that a new drawing has been created with a specific name."""
@@ -44,10 +44,13 @@ class SimpleDrawProCreateDrawing(task_eval.TaskEval):
             device_constants.EMULATOR_DATA, "Pictures"
         ),
     )
+    self.init_script = DrawInitSteps()
 
   def initialize_task(self, env: interface.AsyncEnv) -> None:
     super().initialize_task(env)
     self.create_file_task.initialize_task(env)
+    #执行初始化脚本
+    self.init_script.run(env,self.params['file_name'])
 
   def is_successful(self, env: interface.AsyncEnv) -> float:
     super().is_successful(env)

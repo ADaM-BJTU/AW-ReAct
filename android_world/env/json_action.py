@@ -16,8 +16,7 @@
 
 import dataclasses
 import json
-from typing import Optional
-
+from typing import Optional, Union
 
 _JSON_SEPARATORS = (',', ':')
 
@@ -104,7 +103,7 @@ class JSONAction:
   """
 
   action_type: Optional[str] = None
-  index: Optional[str | int] = None
+  index: Optional[Union[str, int]] = None
   x: Optional[int] = None
   y: Optional[int] = None
   text: Optional[str] = None
@@ -113,6 +112,8 @@ class JSONAction:
   app_name: Optional[str] = None
   keycode: Optional[str] = None
   clear_text: Optional[bool] = None
+  # #不要自己输入空格
+  # press_enter: Optional[bool]= None
 
   def __post_init__(self):
     if self.action_type not in _ACTION_TYPES:

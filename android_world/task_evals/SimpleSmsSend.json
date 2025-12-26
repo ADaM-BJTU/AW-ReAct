@@ -1,0 +1,125 @@
+[
+  {
+    "timestamp": 10.030258655548096,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(11104,29667) → 屏幕:(365,2172))",
+    "x": 365,
+    "y": 2172,
+    "raw_x": 11104,
+    "raw_y": 29667,
+    "element": {
+      "index": 52,
+      "text": null,
+      "content_description": "Space",
+      "class_name": "android.widget.FrameLayout",
+      "bbox": {
+        "x_min": 272,
+        "x_max": 807,
+        "y_min": 2118,
+        "y_max": 2274
+      }
+    },
+    "text_key": "element_52"
+  },
+  {
+    "timestamp": 10.045958518981934,
+    "action_type": "input_text",
+    "step_desc": "输入文本sms\n",
+    "text": "sms"
+  },
+  {
+    "timestamp": 10.959324359893799,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(13258,5993) → 屏幕:(436,438))",
+    "x": 436,
+    "y": 438,
+    "raw_x": 13258,
+    "raw_y": 5993,
+    "element": null,
+    "text_key": "unknown"
+  },
+  {
+    "timestamp": 11.850557565689087,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(4915,6075) → 屏幕:(161,444))",
+    "x": 161,
+    "y": 444,
+    "raw_x": 4915,
+    "raw_y": 6075,
+    "element": {
+      "index": 3,
+      "text": "SMS Messenger",
+      "content_description": "SMS Messenger",
+      "class_name": "android.widget.TextView",
+      "bbox": {
+        "x_min": 57,
+        "x_max": 298,
+        "y_min": 328,
+        "y_max": 611
+      }
+    },
+    "text_key": "sms_messenger"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待8.23秒",
+    "duration": 8.23,
+    "timestamp": 11.850557565689087
+  },
+  {
+    "timestamp": 20.081307649612427,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(29126,30282) → 屏幕:(959,2217))",
+    "x": 959,
+    "y": 2217,
+    "raw_x": 29126,
+    "raw_y": 30282,
+    "element": {
+      "index": 50,
+      "text": null,
+      "content_description": "Done",
+      "class_name": "android.widget.FrameLayout",
+      "bbox": {
+        "x_min": 914,
+        "x_max": 1075,
+        "y_min": 2118,
+        "y_max": 2274
+      }
+    },
+    "text_key": "element_50"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待1.67秒",
+    "duration": 1.67,
+    "timestamp": 20.081307649612427
+  },
+  {
+    "timestamp": 21.75253963470459,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(10922,4655) → 屏幕:(359,340))",
+    "x": 359,
+    "y": 340,
+    "raw_x": 10922,
+    "raw_y": 4655,
+    "element": {
+      "index": 2,
+      "text": "193840583",
+      "content_description": null,
+      "class_name": "android.widget.EditText",
+      "bbox": {
+        "x_min": 42,
+        "x_max": 912,
+        "y_min": 296,
+        "y_max": 422
+      }
+    },
+    "text_key": "193840583"
+  },
+  {
+    "timestamp": 21.765167236328125,
+    "action_type": "input_text",
+    "step_desc": "输入文本193840583\n",
+    "text": "193840583"
+  }
+]

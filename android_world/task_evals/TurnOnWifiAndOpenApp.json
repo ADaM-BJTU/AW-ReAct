@@ -1,0 +1,246 @@
+[
+  {
+    "timestamp": 7.196300983428955,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(8404,382) → 屏幕:(276,27))",
+    "x": 276,
+    "y": 27,
+    "raw_x": 8404,
+    "raw_y": 382,
+    "element": {
+      "index": 0,
+      "text": null,
+      "content_description": null,
+      "class_name": "android.widget.FrameLayout",
+      "bbox": {
+        "x_min": 0,
+        "x_max": 1080,
+        "y_min": 0,
+        "y_max": 2400
+      }
+    },
+    "text_key": "element_0"
+  },
+  {
+    "timestamp": 7.869675636291504,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(8495,668) → 屏幕:(279,48))",
+    "x": 279,
+    "y": 48,
+    "raw_x": 8495,
+    "raw_y": 668,
+    "element": {
+      "index": 0,
+      "text": null,
+      "content_description": null,
+      "class_name": "android.widget.FrameLayout",
+      "bbox": {
+        "x_min": 0,
+        "x_max": 1080,
+        "y_min": 0,
+        "y_max": 2400
+      }
+    },
+    "text_key": "element_0"
+  },
+  {
+    "timestamp": 8.601854085922241,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(8586,901) → 屏幕:(282,65))",
+    "x": 282,
+    "y": 65,
+    "raw_x": 8586,
+    "raw_y": 901,
+    "element": {
+      "index": 0,
+      "text": null,
+      "content_description": null,
+      "class_name": "android.widget.FrameLayout",
+      "bbox": {
+        "x_min": 0,
+        "x_max": 1080,
+        "y_min": 0,
+        "y_max": 2400
+      }
+    },
+    "text_key": "element_0"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待1.67秒",
+    "duration": 1.67,
+    "timestamp": 8.601854085922241
+  },
+  {
+    "timestamp": 10.276240825653076,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(8768,1310) → 屏幕:(288,95))",
+    "x": 288,
+    "y": 95,
+    "raw_x": 8768,
+    "raw_y": 1310,
+    "element": null,
+    "text_key": "unknown"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待2.7秒",
+    "duration": 2.7,
+    "timestamp": 10.276240825653076
+  },
+  {
+    "timestamp": 12.980462551116943,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(8859,1720) → 屏幕:(291,125))",
+    "x": 291,
+    "y": 125,
+    "raw_x": 8859,
+    "raw_y": 1720,
+    "element": {
+      "index": 0,
+      "text": "On",
+      "content_description": "Internet",
+      "class_name": "android.widget.Switch",
+      "bbox": {
+        "x_min": 42,
+        "x_max": 529,
+        "y_min": 126,
+        "y_max": 284
+      }
+    },
+    "text_key": "on"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待1.17秒",
+    "duration": 1.17,
+    "timestamp": 12.980462551116943
+  },
+  {
+    "timestamp": 14.148971557617188,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(9132,2361) → 屏幕:(300,172))",
+    "x": 300,
+    "y": 172,
+    "raw_x": 9132,
+    "raw_y": 2361,
+    "element": {
+      "index": 0,
+      "text": "On",
+      "content_description": "Internet",
+      "class_name": "android.widget.Switch",
+      "bbox": {
+        "x_min": 42,
+        "x_max": 529,
+        "y_min": 126,
+        "y_max": 284
+      }
+    },
+    "text_key": "on"
+  },
+  {
+    "timestamp": 14.832579374313354,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(9314,3167) → 屏幕:(306,231))",
+    "x": 306,
+    "y": 231,
+    "raw_x": 9314,
+    "raw_y": 3167,
+    "element": {
+      "index": 0,
+      "text": "On",
+      "content_description": "Internet",
+      "class_name": "android.widget.Switch",
+      "bbox": {
+        "x_min": 42,
+        "x_max": 529,
+        "y_min": 126,
+        "y_max": 284
+      }
+    },
+    "text_key": "on"
+  },
+  {
+    "timestamp": 15.483122825622559,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(9587,4136) → 屏幕:(315,302))",
+    "x": 315,
+    "y": 302,
+    "raw_x": 9587,
+    "raw_y": 4136,
+    "element": {
+      "index": 0,
+      "text": "On",
+      "content_description": "Internet",
+      "class_name": "android.widget.Switch",
+      "bbox": {
+        "x_min": 42,
+        "x_max": 529,
+        "y_min": 126,
+        "y_max": 284
+      }
+    },
+    "text_key": "on"
+  },
+  {
+    "timestamp": 16.15853500366211,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(9860,5270) → 屏幕:(324,385))",
+    "x": 324,
+    "y": 385,
+    "raw_x": 9860,
+    "raw_y": 5270,
+    "element": {
+      "index": 2,
+      "text": null,
+      "content_description": null,
+      "class_name": "android.widget.LinearLayout",
+      "bbox": {
+        "x_min": 42,
+        "x_max": 529,
+        "y_min": 305,
+        "y_max": 463
+      }
+    },
+    "text_key": "element_2"
+  },
+  {
+    "timestamp": 16.83084464073181,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(10224,6512) → 屏幕:(336,476))",
+    "x": 336,
+    "y": 476,
+    "raw_x": 10224,
+    "raw_y": 6512,
+    "element": {
+      "index": 2,
+      "text": null,
+      "content_description": null,
+      "class_name": "android.widget.LinearLayout",
+      "bbox": {
+        "x_min": 42,
+        "x_max": 529,
+        "y_min": 305,
+        "y_max": 463
+      }
+    },
+    "text_key": "element_2"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待1.64秒",
+    "duration": 1.64,
+    "timestamp": 16.83084464073181
+  },
+  {
+    "timestamp": 18.475034475326538,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(10467,7768) → 屏幕:(344,568))",
+    "x": 344,
+    "y": 568,
+    "raw_x": 10467,
+    "raw_y": 7768,
+    "element": null,
+    "text_key": "unknown"
+  }
+]

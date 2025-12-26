@@ -24,8 +24,9 @@ from android_world.task_evals import task_eval
 from android_world.task_evals.common_validators import file_validators
 from android_world.task_evals.utils import user_data_generation
 from android_world.utils import file_utils
-
-
+from android_world.task_evals.single.audio_recorder_init_steps import AudioRecorderInitSteps
+from android_world.task_evals.single.audio_recorder_init_steps import AudioRecorderInitStepsWithTypingError
+from android_world.task_evals.similarize_name import _similarize_name,generate_similar_contacts
 class _AudioRecorder(task_eval.TaskEval):
   """Base class for AudioRecorder tasks."""
 
@@ -99,6 +100,10 @@ class AudioRecorderRecordAudioWithFileName(_AudioRecorder):
     self.create_file_task = file_validators.CreateFile(
         params, device_constants.AUDIORECORDER_DATA
     )
+    #初始化独立脚本实例
+    self.init_script = AudioRecorderInitSteps(
+        fixed_init_filename="Wrong_file_name"
+    )
 
   def _clear_audio_recorder_data(self, env: interface.AsyncEnv) -> None:
     """Clears all audio recorder data on device."""
@@ -110,6 +115,105 @@ class AudioRecorderRecordAudioWithFileName(_AudioRecorder):
     super().initialize_task(env)
     self.create_file_task.initialize_task(env)
     self._clear_audio_recorder_data(env)
+    #执行独立封装的初始化步骤
+    try:
+        result = self.init_script.run_until_filename_input(env)
+        self.entered_filename = result['entered_filename']
+        self.params["popup_required"] = result.get("popup_required",False)
+    except Exception as e:
+        raise RuntimeError(f"初始化步骤执行失败：{str(e)}") from e
+    self.initialized = True
+
+  def is_successful(self, env: interface.AsyncEnv) -> float:
+    super().is_successful(env)
+    file_name = self.params["file_name"]
+    exists = file_utils.check_file_or_folder_exists(
+        file_name + ".m4a", self.create_file_task.data_directory, env.controller
+    )
+    if not exists:
+      logging.info("%s not found", file_name)
+      return 0.0
+    return 1.0
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    name = [
+        "interview",
+        "meeting",
+        "lecture",
+        "session",
+        "note",
+        "conference",
+        "webinar",
+        "workshop",
+        "seminar",
+        "briefing",
+        "discussion",
+        "talk",
+        "presentation",
+        "training",
+        "guidance",
+        "memo",
+        "narration",
+        "storytelling",
+        "journal",
+        "diary",
+        "debate",
+        "symposium",
+        "roundtable",
+        "consultation",
+        "review",
+    ]
+    return {
+        "file_name": user_data_generation.generate_modified_file_name(
+            random.choice(name) + ".m4a"
+        ),
+        "text": "",  # Unused.
+    }
+
+  def tear_down(self, env: interface.AsyncEnv) -> None:
+    super().tear_down(env)
+    self.create_file_task.tear_down(env)
+    self._clear_audio_recorder_data(env)
+
+
+#由AudioRecorderRecordAudioWithFileName作为母任务下分的子任务合集
+
+#变体1：打字错误
+class AudioRecorderRecordAudioWithFileNameWithTypingError(_AudioRecorder):
+  """Task for checking that one audio recording with file_name has been completed."""
+
+  complexity = 2
+  schema = file_validators.CreateFile.schema
+  template = (
+      'Record an audio clip and save it with name "{file_name}" using Audio'
+      " Recorder app."
+  )
+
+  def __init__(self, params: dict[str, Any]):
+    """See base class."""
+    super().__init__(params)
+    self.initialized = False
+    self.create_file_task = file_validators.CreateFile(
+        params, device_constants.AUDIORECORDER_DATA
+    )
+    #初始化独立脚本实例
+    self.init_script = AudioRecorderInitStepsWithTypingError()
+
+  def _clear_audio_recorder_data(self, env: interface.AsyncEnv) -> None:
+    """Clears all audio recorder data on device."""
+    file_utils.clear_directory(
+        device_constants.AUDIORECORDER_DATA, env.controller
+    )
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    self.create_file_task.initialize_task(env)
+    self._clear_audio_recorder_data(env)
+    self.initialized = True
+    real_name = self.params["file_name"]
+    similar_name = _similarize_name(real_name)
+    self.init_script.run(env,similar_name)
 
   def is_successful(self, env: interface.AsyncEnv) -> float:
     super().is_successful(env)

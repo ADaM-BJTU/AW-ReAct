@@ -1,0 +1,86 @@
+[
+  {
+    "timestamp": 6.031670570373535,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(29308,28220) → 屏幕:(965,2066))",
+    "x": 965,
+    "y": 2066,
+    "raw_x": 29308,
+    "raw_y": 28220,
+    "element": {
+      "index": 50,
+      "text": null,
+      "content_description": "Delete",
+      "class_name": "android.widget.FrameLayout",
+      "bbox": {
+        "x_min": 914,
+        "x_max": 1075,
+        "y_min": 1963,
+        "y_max": 2118
+      }
+    },
+    "text_key": "element_50"
+  },
+  {
+    "timestamp": 6.6747047901153564,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(7251,7481) → 屏幕:(238,547))",
+    "x": 238,
+    "y": 547,
+    "raw_x": 7251,
+    "raw_y": 7481,
+    "element": {
+      "index": 0,
+      "text": "Name",
+      "content_description": null,
+      "class_name": "android.widget.TextView",
+      "bbox": {
+        "x_min": 84,
+        "x_max": 996,
+        "y_min": 492,
+        "y_max": 535
+      }
+    },
+    "text_key": "name"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待10.89秒",
+    "duration": 10.89,
+    "timestamp": 6.6747047901153564
+  },
+  {
+    "timestamp": 17.56608009338379,
+    "action_type": "input_text",
+    "step_desc": "输入文本20152213\n",
+    "text": "20152213"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待5.61秒",
+    "duration": 5.61,
+    "timestamp": 17.56608009338379
+  },
+  {
+    "timestamp": 23.178755521774292,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(27882,15182) → 屏幕:(918,1111))",
+    "x": 918,
+    "y": 1111,
+    "raw_x": 27882,
+    "raw_y": 15182,
+    "element": {
+      "index": 8,
+      "text": null,
+      "content_description": null,
+      "class_name": "android.widget.EditText",
+      "bbox": {
+        "x_min": 0,
+        "x_max": 1080,
+        "y_min": 275,
+        "y_max": 1396
+      }
+    },
+    "text_key": "element_8"
+  }
+]

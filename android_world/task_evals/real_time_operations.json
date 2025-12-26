@@ -1,0 +1,126 @@
+[
+  {
+    "timestamp": 6.736503601074219,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(9678,30719) → 屏幕:(318,2249))",
+    "x": 318,
+    "y": 2249,
+    "raw_x": 9678,
+    "raw_y": 30719,
+    "element": null,
+    "text_key": "unknown"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待6.01秒",
+    "duration": 6.01,
+    "timestamp": 6.736503601074219
+  },
+  {
+    "timestamp": 12.741634130477905,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(11286,2962) → 屏幕:(371,216))",
+    "x": 371,
+    "y": 216,
+    "raw_x": 11286,
+    "raw_y": 2962,
+    "element": {
+      "index": 1,
+      "text": "Audio Reco",
+      "content_description": null,
+      "class_name": "android.widget.EditText",
+      "bbox": {
+        "x_min": 214,
+        "x_max": 886,
+        "y_min": 156,
+        "y_max": 301
+      }
+    },
+    "text_key": "audio_reco"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待2.11秒",
+    "duration": 2.11,
+    "timestamp": 12.741634130477905
+  },
+  {
+    "timestamp": 14.855230331420898,
+    "action_type": "input_text",
+    "step_desc": "输入文本「audio recorder\n」",
+    "text": "audio recorder"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待14.23秒",
+    "duration": 14.23,
+    "timestamp": 14.855230331420898
+  },
+  {
+    "timestamp": 29.08882188796997,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(5188,5911) → 屏幕:(170,432))",
+    "x": 170,
+    "y": 432,
+    "raw_x": 5188,
+    "raw_y": 5911,
+    "element": null,
+    "text_key": "unknown"
+  },
+  {
+    "timestamp": 29.938912630081177,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(16656,29667) → 屏幕:(548,2172))",
+    "x": 548,
+    "y": 2172,
+    "raw_x": 16656,
+    "raw_y": 29667,
+    "element": {
+      "index": 12,
+      "text": null,
+      "content_description": "Recording: %s",
+      "class_name": "android.widget.ImageButton",
+      "bbox": {
+        "x_min": 429,
+        "x_max": 650,
+        "y_min": 2074,
+        "y_max": 2295
+      }
+    },
+    "text_key": "element_12"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待10.95秒",
+    "duration": 10.95,
+    "timestamp": 29.938912630081177
+  },
+  {
+    "timestamp": 40.88844299316406,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(22330,29872) → 屏幕:(735,2187))",
+    "x": 735,
+    "y": 2187,
+    "raw_x": 22330,
+    "raw_y": 29872,
+    "element": {
+      "index": 40,
+      "text": null,
+      "content_description": "Space",
+      "class_name": "android.widget.FrameLayout",
+      "bbox": {
+        "x_min": 379,
+        "x_max": 807,
+        "y_min": 2118,
+        "y_max": 2274
+      }
+    },
+    "text_key": "element_40"
+  },
+  {
+    "timestamp": 40.91534686088562,
+    "action_type": "input_text",
+    "step_desc": "输入文本「ccc\n」",
+    "text": "ccc"
+  }
+]

@@ -1,0 +1,128 @@
+[UI元素更新] 共获取到22个元素（最新）
+=== 开始监听触摸事件 ===
+[原始事件] add device 1: /dev/input/event13
+[原始事件] name:     "qwerty2"
+[解析失败] 格式不完整
+[原始事件] add device 2: /dev/input/event12
+[原始事件] name:     "virtio_input_multi_touch_11"
+[解析失败] 格式不完整
+[原始事件] add device 3: /dev/input/event11
+[原始事件] name:     "virtio_input_multi_touch_10"
+[解析失败] 格式不完整
+[原始事件] add device 4: /dev/input/event10
+[原始事件] name:     "virtio_input_multi_touch_9"
+[解析失败] 格式不完整
+[原始事件] add device 5: /dev/input/event9
+[原始事件] name:     "virtio_input_multi_touch_8"
+[解析失败] 格式不完整
+[原始事件] add device 6: /dev/input/event8
+[原始事件] name:     "virtio_input_multi_touch_7"
+[解析失败] 格式不完整
+[原始事件] add device 7: /dev/input/event7
+[原始事件] name:     "virtio_input_multi_touch_6"
+[解析失败] 格式不完整
+[原始事件] add device 8: /dev/input/event6
+[原始事件] name:     "virtio_input_multi_touch_5"
+[解析失败] 格式不完整
+[原始事件] add device 9: /dev/input/event5
+[原始事件] name:     "virtio_input_multi_touch_4"
+[解析失败] 格式不完整
+[原始事件] add device 10: /dev/input/event4
+[原始事件] name:     "virtio_input_multi_touch_3"
+[解析失败] 格式不完整
+[原始事件] add device 11: /dev/input/event3
+[原始事件] name:     "virtio_input_multi_touch_2"
+[解析失败] 格式不完整
+[原始事件] add device 12: /dev/input/event2
+[原始事件] name:     "virtio_input_multi_touch_1"
+[解析失败] 格式不完整
+[原始事件] add device 13: /dev/input/event0
+[原始事件] name:     "Power Button"
+[解析失败] 格式不完整
+[原始事件] add device 14: /dev/input/event1
+[原始事件] name:     "AT Translated Set 2 keyboard"
+[原始事件] /dev/input/event2: EV_ABS       ABS_MT_TRACKING_ID   00000000
+[原始事件] /dev/input/event2: EV_ABS       ABS_MT_POSITION_X    0000727c
+[原始事件] /dev/input/event2: EV_ABS       ABS_MT_POSITION_Y    00006e3c
+[原始事件] /dev/input/event2: EV_ABS       ABS_MT_PRESSURE      00000400
+[原始事件] /dev/input/event2: EV_SYN       SYN_REPORT           00000000
+[坐标转换] 原始(29308,28220) → 屏幕(965,2066)
+[UI元素更新] 共获取到62个元素（最新）
+[查找元素] 坐标(965,2066)，共62个元素
+[找到元素] 索引50，文本：None
+[记录点击] 屏幕坐标(965,2066)
+[原始事件] /dev/input/event2: EV_ABS       ABS_MT_PRESSURE      00000000
+[原始事件] /dev/input/event2: EV_ABS       ABS_MT_TRACKING_ID   ffffffff
+[原始事件] /dev/input/event2: EV_SYN       SYN_REPORT           00000000
+[原始事件] /dev/input/event2: EV_ABS       ABS_MT_TRACKING_ID   00000000
+[原始事件] /dev/input/event2: EV_ABS       ABS_MT_POSITION_X    00001c53
+[原始事件] /dev/input/event2: EV_ABS       ABS_MT_POSITION_Y    00001d39
+[原始事件] /dev/input/event2: EV_ABS       ABS_MT_PRESSURE      00000400
+[原始事件] /dev/input/event2: EV_SYN       SYN_REPORT           00000000
+[坐标转换] 原始(7251,7481) → 屏幕(238,547)
+[UI元素更新] 共获取到62个元素（最新）
+[查找元素] 坐标(238,547)，共62个元素
+[找到元素] 索引0，文本：Name
+[记录点击] 屏幕坐标(238,547)
+[原始事件] /dev/input/event2: EV_ABS       ABS_MT_PRESSURE      00000000
+[原始事件] /dev/input/event2: EV_ABS       ABS_MT_TRACKING_ID   ffffffff
+[原始事件] /dev/input/event2: EV_SYN       SYN_REPORT           00000000
+[原始事件] /dev/input/event13: EV_KEY       KEY_2                DOWN
+[键盘输入] 当前文本：2
+[原始事件] /dev/input/event13: EV_SYN       SYN_REPORT           00000000
+[原始事件] /dev/input/event13: EV_KEY       KEY_2                UP
+[原始事件] /dev/input/event13: EV_SYN       SYN_REPORT           00000000
+[原始事件] /dev/input/event13: EV_KEY       KEY_0                DOWN
+[键盘输入] 当前文本：20
+[原始事件] /dev/input/event13: EV_SYN       SYN_REPORT           00000000
+[原始事件] /dev/input/event13: EV_KEY       KEY_0                UP
+[原始事件] /dev/input/event13: EV_SYN       SYN_REPORT           00000000
+[原始事件] /dev/input/event13: EV_KEY       KEY_1                DOWN
+[键盘输入] 当前文本：201
+[原始事件] /dev/input/event13: EV_SYN       SYN_REPORT           00000000
+[原始事件] /dev/input/event13: EV_KEY       KEY_1                UP
+[原始事件] /dev/input/event13: EV_SYN       SYN_REPORT           00000000
+[原始事件] /dev/input/event13: EV_KEY       KEY_5                DOWN
+[键盘输入] 当前文本：2015
+[原始事件] /dev/input/event13: EV_SYN       SYN_REPORT           00000000
+[原始事件] /dev/input/event13: EV_KEY       KEY_5                UP
+[原始事件] /dev/input/event13: EV_SYN       SYN_REPORT           00000000
+[原始事件] /dev/input/event13: EV_KEY       KEY_2                DOWN
+[键盘输入] 当前文本：20152
+[原始事件] /dev/input/event13: EV_SYN       SYN_REPORT           00000000
+[原始事件] /dev/input/event13: EV_KEY       KEY_2                UP
+[原始事件] /dev/input/event13: EV_SYN       SYN_REPORT           00000000
+[原始事件] /dev/input/event13: EV_KEY       KEY_2                DOWN
+[键盘输入] 当前文本：201522
+[原始事件] /dev/input/event13: EV_SYN       SYN_REPORT           00000000
+[原始事件] /dev/input/event13: EV_KEY       KEY_2                UP
+[原始事件] /dev/input/event13: EV_SYN       SYN_REPORT           00000000
+[原始事件] /dev/input/event13: EV_KEY       KEY_1                DOWN
+[键盘输入] 当前文本：2015221
+[原始事件] /dev/input/event13: EV_SYN       SYN_REPORT           00000000
+[原始事件] /dev/input/event13: EV_KEY       KEY_1                UP
+[原始事件] /dev/input/event13: EV_SYN       SYN_REPORT           00000000
+[原始事件] /dev/input/event13: EV_KEY       KEY_3                DOWN
+[键盘输入] 当前文本：20152213
+[原始事件] /dev/input/event13: EV_SYN       SYN_REPORT           00000000
+[原始事件] /dev/input/event13: EV_KEY       KEY_3                UP
+[原始事件] /dev/input/event13: EV_SYN       SYN_REPORT           00000000
+[原始事件] /dev/input/event13: EV_KEY       KEY_ENTER            DOWN
+[键盘输入] 当前文本：20152213
+
+[原始事件] /dev/input/event13: EV_SYN       SYN_REPORT           00000000
+[原始事件] /dev/input/event13: EV_KEY       KEY_ENTER            UP
+[原始事件] /dev/input/event13: EV_SYN       SYN_REPORT           00000000
+[原始事件] /dev/input/event2: EV_ABS       ABS_MT_TRACKING_ID   00000000
+[原始事件] /dev/input/event2: EV_ABS       ABS_MT_POSITION_X    00006cea
+[原始事件] /dev/input/event2: EV_ABS       ABS_MT_POSITION_Y    00003b4e
+[原始事件] /dev/input/event2: EV_ABS       ABS_MT_PRESSURE      00000400
+[原始事件] /dev/input/event2: EV_SYN       SYN_REPORT           00000000
+[坐标转换] 原始(27882,15182) → 屏幕(918,1111)
+[UI元素更新] 共获取到66个元素（最新）
+[查找元素] 坐标(918,1111)，共66个元素
+[找到元素] 索引8，文本：None
+[记录点击] 屏幕坐标(918,1111)
+[原始事件] /dev/input/event2: EV_ABS       ABS_MT_PRESSURE      00000000
+[原始事件] /dev/input/event2: EV_ABS       ABS_MT_TRACKING_ID   ffffffff
+[原始事件] /dev/input/event2: EV_SYN       SYN_REPORT           00000000

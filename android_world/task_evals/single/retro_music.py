@@ -23,11 +23,13 @@ from android_world.env import device_constants
 from android_world.env import interface
 from android_world.task_evals import task_eval
 from android_world.task_evals.common_validators import sqlite_validators
+from android_world.task_evals.similarize_name import _similarize_name
 from android_world.task_evals.utils import sqlite_schema_utils
 from android_world.task_evals.utils import sqlite_utils
 from android_world.task_evals.utils import user_data_generation
 from android_world.utils import file_utils
-
+from android_world.task_evals.single.retro_music_init_steps import RetroMusicInitSteps, \
+    RetroCreatePlaylistInitStepsWithTypingError, RetroCreatePlaylistInitStepsWithSomeWrongSongs
 
 _APP_NAME = 'retro music'
 _PLAYLIST_DB_PATH = (
@@ -158,6 +160,10 @@ class RetroCreatePlaylist(task_eval.TaskEval):
           duration_milliseconds=random.randint(3 * 60 * 1000, 5 * 60 * 1000),
       )
     _scan_music_directory(env)
+    print(self.params['files'],self.params['playlist_name'])
+    self.init_script = RetroMusicInitSteps()
+    #执行初始化脚本
+    self.init_script.run(env,self.params['files'],self.params['playlist_name'])
 
   def is_successful(self, env: interface.AsyncEnv) -> float:
     actual = _get_playlist_data(env)
@@ -402,3 +408,148 @@ def _generate_playlist_name() -> str:
 
   theme = random.choice(themes)
   return f'{theme} {identifier}'
+
+#变体1：模拟playlist名字打错
+class RetroCreatePlaylistWithTypingError(task_eval.TaskEval):
+  """Task to create a playlist in Retro Music."""
+
+  app_names = ['retro music']
+  complexity = 2.4
+  schema = {
+      'type': 'object',
+      'properties': {
+          'playlist_name': {'type': 'string'},
+          'files': {
+              'type': 'array',
+              'items': {'type': 'string'},
+          },
+      },
+      'required': ['playlist_name', 'files'],
+  }
+  template = ''  # Directly use goal.
+
+  @property
+  def goal(self) -> str:
+    names = ', '.join(f.split('.')[0] for f in self.params['files'])
+    playlist_name = self.params['playlist_name']
+    return (
+        f'Create a playlist in Retro Music titled "{playlist_name}" with the'
+        f' following songs, in order: {names}'
+    )
+
+  def initialize_task(self, env: interface.AsyncEnv):
+    super().initialize_task(env)
+    user_data_generation.clear_internal_storage(env)
+    _clear_playlist_dbs(env)
+
+    for file in self.params['files'] + self.params['noise_files']:
+      user_data_generation.write_mp3_file_to_device(
+          file_utils.convert_to_posix_path(device_constants.MUSIC_DATA, file),
+          env,
+          title=file.split('.')[0],
+          artist=random.choice(user_data_generation.COMMON_GIVEN_NAMES),
+          duration_milliseconds=random.randint(3 * 60 * 1000, 5 * 60 * 1000),
+      )
+    _scan_music_directory(env)
+    self.init_script = RetroCreatePlaylistInitStepsWithTypingError()
+    similar_name = _similarize_name(self.params['playlist_name'])
+    self.init_script.run(env,similar_name)
+
+  def is_successful(self, env: interface.AsyncEnv) -> float:
+    actual = _get_playlist_data(env)
+    return int(
+        sqlite_validators.verify_playlist(
+            actual,
+            self.params['playlist_name'],
+            [f.split('.')[0] for f in self.params['files']],
+        )
+    )
+
+  def tear_down(self, env: interface.AsyncEnv):
+    super().tear_down(env)
+    user_data_generation.clear_internal_storage(env)
+    _clear_playlist_dbs(env)
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    playlist_name = _generate_playlist_name()
+    files = [f'{name}.mp3' for name in random.sample(_SONGS, 15)]
+    num_files = random.randint(2, 5)
+    files, noise_files = files[0:num_files], files[num_files:]
+    return {
+        'playlist_name': playlist_name,
+        'files': files,
+        'noise_files': noise_files,
+    }
+
+#变体2：已创建部分歌单内容，但是这部分有错误信息
+class RetroCreatePlaylistWithSomeWrongSongs(task_eval.TaskEval):
+  """Task to create a playlist in Retro Music."""
+
+  app_names = ['retro music']
+  complexity = 2.4
+  schema = {
+      'type': 'object',
+      'properties': {
+          'playlist_name': {'type': 'string'},
+          'files': {
+              'type': 'array',
+              'items': {'type': 'string'},
+          },
+      },
+      'required': ['playlist_name', 'files'],
+  }
+  template = ''  # Directly use goal.
+
+  @property
+  def goal(self) -> str:
+    names = ', '.join(f.split('.')[0] for f in self.params['files'])
+    playlist_name = self.params['playlist_name']
+    return (
+        f'Create a playlist in Retro Music titled "{playlist_name}" with the'
+        f' following songs, in order: {names}'
+    )
+
+  def initialize_task(self, env: interface.AsyncEnv):
+    super().initialize_task(env)
+    user_data_generation.clear_internal_storage(env)
+    _clear_playlist_dbs(env)
+
+    for file in self.params['files'] + self.params['noise_files']:
+      user_data_generation.write_mp3_file_to_device(
+          file_utils.convert_to_posix_path(device_constants.MUSIC_DATA, file),
+          env,
+          title=file.split('.')[0],
+          artist=random.choice(user_data_generation.COMMON_GIVEN_NAMES),
+          duration_milliseconds=random.randint(3 * 60 * 1000, 5 * 60 * 1000),
+      )
+    _scan_music_directory(env)
+    self.init_script = RetroCreatePlaylistInitStepsWithSomeWrongSongs()
+    self.init_script.run(env,self.params['playlist_name'])
+
+  def is_successful(self, env: interface.AsyncEnv) -> float:
+    actual = _get_playlist_data(env)
+    return int(
+        sqlite_validators.verify_playlist(
+            actual,
+            self.params['playlist_name'],
+            [f.split('.')[0] for f in self.params['files']],
+        )
+    )
+
+  def tear_down(self, env: interface.AsyncEnv):
+    super().tear_down(env)
+    user_data_generation.clear_internal_storage(env)
+    _clear_playlist_dbs(env)
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    playlist_name = _generate_playlist_name()
+    files = [f'{name}.mp3' for name in random.sample(_SONGS, 15)]
+    num_files = random.randint(2, 5)
+    files, noise_files = files[0:num_files], files[num_files:]
+    return {
+        'playlist_name': playlist_name,
+        'files': files,
+        'noise_files': noise_files,
+    }

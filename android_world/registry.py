@@ -111,6 +111,8 @@ class TaskRegistry:
       # keep-sorted start
       audio_recorder.AudioRecorderRecordAudio,
       audio_recorder.AudioRecorderRecordAudioWithFileName,
+      #变体1：打字错误
+      audio_recorder.AudioRecorderRecordAudioWithFileNameWithTypingError,
       browser.BrowserDraw,
       browser.BrowserMaze,
       browser.BrowserMultiply,
@@ -139,18 +141,47 @@ class TaskRegistry:
       expense.ExpenseDeleteMultiple2,
       expense.ExpenseDeleteSingle,
       files.FilesDeleteFile,
+      #变体1
+      files.FilesDeleteFileWithSimilarFiles,
+      #变体2
+      files.FilesDeleteFileWithNotExsitFile,
       files.FilesMoveFile,
+      #变体1
+      files.FilesMoveFileWithSimilarFiles,
+      #变体2
+      files.FilesMoveFileWithNotExsitFile,
       markor.MarkorAddNoteHeader,
       markor.MarkorChangeNoteContent,
+      #变体1
+      markor.MarkorChangeNoteContentWithSimilarNote,
+      #变体2
+      markor.MarkorChangeNoteContentWithTypingError,
+      #变体3
+      markor.MarkorChangeNoteContentWithNotExistNote,
       markor.MarkorCreateFolder,
+      #变体1
+      markor.MarkorCreateFolderWithTypingError,
       markor.MarkorCreateNote,
+      #变体1
+      markor.MarkorCreateNoteWithFileTypingError,
+      #变体2
+      markor.MarkorCreateNoteWithTextTypingError,
       markor.MarkorCreateNoteFromClipboard,
       markor.MarkorDeleteAllNotes,
       markor.MarkorDeleteNewestNote,
       markor.MarkorDeleteNote,
+      #变体1
+      markor.MarkorDeleteNoteWithNotExistNote,
+      #变体2
+      markor.MarkorDeleteNoteWithSimilarNote,
       markor.MarkorEditNote,
       markor.MarkorMergeNotes,
       markor.MarkorMoveNote,
+      #新增任务
+      #变体1
+      markor.MarkorMoveNoteWithNotExistDestinationFolder,
+      #变体2
+      markor.MarkorMoveNoteWithSimilarFolders,
       markor.MarkorTranscribeReceipt,
       markor.MarkorTranscribeVideo,
       # Markor composite tasks.
@@ -173,6 +204,10 @@ class TaskRegistry:
       recipe.RecipeDeleteSingleRecipe,
       recipe.RecipeDeleteSingleWithRecipeWithNoise,
       retro_music.RetroCreatePlaylist,
+      #变体1
+      retro_music.RetroCreatePlaylistWithTypingError,
+      #变体2
+      retro_music.RetroCreatePlaylistWithSomeWrongSongs,
       retro_music.RetroPlayingQueue,
       retro_music.RetroPlaylistDuration,
       retro_music.RetroSavePlaylist,
@@ -184,6 +219,13 @@ class TaskRegistry:
       sms.SimpleSmsSend,
       sms.SimpleSmsSendClipboardContent,
       sms.SimpleSmsSendReceivedAddress,
+      #新增任务
+      #变体1
+      sms.SimpleSmsSendReceivedAddressWithSimilarContact,
+      #变体2
+      sms.SimpleSmsSendReceivedAddressWithNotExistContact,
+      #变体3
+      sms.SimpleSmsSendReceivedAddressWithTypingError,
       system.OpenAppTaskEval,
       system.SystemBluetoothTurnOff,
       system.SystemBluetoothTurnOffVerify,

@@ -17,6 +17,7 @@
 import copy
 import logging
 import time
+import random
 from typing import Any
 from android_env import env_interface
 from android_world.env import adb_utils
@@ -24,6 +25,45 @@ from android_world.env import android_world_controller
 from android_world.env import json_action
 from android_world.env import representation_utils
 
+RANDOM_SEED = 42
+random.seed(RANDOM_SEED)
+
+def corrupt_text(text: str, prob: float = 0.2) -> str:
+  """
+  随机扰动输入文本：
+  - prob：每个扰动发生的概率
+  """
+  # 决定是否扰动
+  if random.random() > prob:
+    return text
+
+  # 操作类型
+  operations = ["typo", "delete_char", "extra_space"]
+  op = random.choice(operations)
+
+  if op == "typo":
+    # 替换一个字符
+    if len(text) > 0:
+      idx = random.randint(0, len(text) - 1)
+      original = text[idx]
+      # 随机生成一个不同的字符
+      replacement = chr(random.randint(97, 122))  # a-z
+      while replacement == original:
+        replacement = chr(random.randint(97, 122))
+      text = text[:idx] + replacement + text[idx + 1:]
+
+  elif op == "delete_char":
+    # 删除一个字符
+    if len(text) > 1:
+      idx = random.randint(0, len(text) - 1)
+      text = text[:idx] + text[idx + 1:]
+
+  elif op == "extra_space":
+    # 加一个空格到随机位置
+    idx = random.randint(0, len(text))
+    text = text[:idx] + " " + text[idx:]
+
+  return text
 
 def execute_adb_action(
     action: json_action.JSONAction,
@@ -73,6 +113,10 @@ def execute_adb_action(
 
   elif action.action_type == 'input_text':
     text = action.text
+    #若超参开启，进行扰动
+    if hasattr(env, "agent") and getattr(env.agent, "enable_typo_mode", False):
+      text = corrupt_text(text)
+
     if text:
       if action.index is not None or (
           action.x is not None and action.y is not None
@@ -83,7 +127,7 @@ def execute_adb_action(
         execute_adb_action(click_action, screen_elements, screen_size, env)
         time.sleep(1.0)
 
-      if action.clear_text:
+      # if action.clear_text:
         # Select all existing text and delete it.
         adb_utils.issue_generic_request(
             [
@@ -312,3 +356,5 @@ def _levenshtein_distance(s1: str, s2: str) -> int:
     previous_row = current_row
 
   return previous_row[-1]
+
+

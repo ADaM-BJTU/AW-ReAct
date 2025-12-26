@@ -1,0 +1,155 @@
+[
+  {
+    "timestamp": 6.146543979644775,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(15594,30432) → 屏幕:(513,2228))",
+    "x": 513,
+    "y": 2228,
+    "raw_x": 15594,
+    "raw_y": 30432,
+    "element": null,
+    "text_key": "unknown"
+  },
+  {
+    "timestamp": 6.830016613006592,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(8859,3003) → 屏幕:(291,219))",
+    "x": 291,
+    "y": 219,
+    "raw_x": 8859,
+    "raw_y": 3003,
+    "element": {
+      "index": 1,
+      "text": "Search apps, web and more",
+      "content_description": null,
+      "class_name": "android.widget.EditText",
+      "bbox": {
+        "x_min": 214,
+        "x_max": 1023,
+        "y_min": 156,
+        "y_max": 301
+      }
+    },
+    "text_key": "search_apps,_web_and_more"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待4.49秒",
+    "duration": 4.49,
+    "timestamp": 6.830016613006592
+  },
+  {
+    "timestamp": 11.320865869522095,
+    "action_type": "input_text",
+    "step_desc": "输入文本contact\n",
+    "text": "contact"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待3.56秒",
+    "duration": 3.56,
+    "timestamp": 11.320865869522095
+  },
+  {
+    "timestamp": 14.882288694381714,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(5552,5911) → 屏幕:(182,432))",
+    "x": 182,
+    "y": 432,
+    "raw_x": 5552,
+    "raw_y": 5911,
+    "element": {
+      "index": 3,
+      "text": "Contacts",
+      "content_description": "Contacts",
+      "class_name": "android.widget.TextView",
+      "bbox": {
+        "x_min": 57,
+        "x_max": 298,
+        "y_min": 328,
+        "y_max": 611
+      }
+    },
+    "text_key": "contacts"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待6.93秒",
+    "duration": 6.93,
+    "timestamp": 14.882288694381714
+  },
+  {
+    "timestamp": 21.807957410812378,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(28610,27578) → 屏幕:(942,2019))",
+    "x": 942,
+    "y": 2019,
+    "raw_x": 28610,
+    "raw_y": 27578,
+    "element": {
+      "index": 0,
+      "text": null,
+      "content_description": "Create contact",
+      "class_name": "android.widget.ImageButton",
+      "bbox": {
+        "x_min": 870,
+        "x_max": 1017,
+        "y_min": 1938,
+        "y_max": 2085
+      }
+    },
+    "text_key": "element_0"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待3.55秒",
+    "duration": 3.55,
+    "timestamp": 21.807957410812378
+  },
+  {
+    "timestamp": 25.361769437789917,
+    "action_type": "click",
+    "step_desc": "点击坐标(原始:(12469,11796) → 屏幕:(410,863))",
+    "x": 410,
+    "y": 863,
+    "raw_x": 12469,
+    "raw_y": 11796,
+    "element": {
+      "index": 4,
+      "text": null,
+      "content_description": null,
+      "class_name": "android.widget.ScrollView",
+      "bbox": {
+        "x_min": 0,
+        "x_max": 1080,
+        "y_min": 296,
+        "y_max": 2337
+      }
+    },
+    "text_key": "element_4"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待2.29秒",
+    "duration": 2.29,
+    "timestamp": 25.361769437789917
+  },
+  {
+    "timestamp": 27.64990735054016,
+    "action_type": "input_text",
+    "step_desc": "输入文本123\n",
+    "text": "123"
+  },
+  {
+    "action_type": "WAIT",
+    "step_desc": "等待2.98秒",
+    "duration": 2.98,
+    "timestamp": 27.64990735054016
+  },
+  {
+    "timestamp": 30.634578466415405,
+    "action_type": "input_text",
+    "step_desc": "输入文本456\n",
+    "text": "456"
+  }
+]

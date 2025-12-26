@@ -17,7 +17,7 @@
 import os
 import re
 import time
-from typing import Any, Callable, Collection, Iterable, Literal, Optional, TypeVar
+from typing import Any, Callable, Collection, Iterable, Literal, Optional, TypeVar, Union
 import unicodedata
 from absl import logging
 from android_env import env_interface
@@ -500,7 +500,7 @@ def type_text(
 
 
 def issue_generic_request(
-    args: Collection[str] | str,
+    args: Union[Collection[str], str],
     env: env_interface.AndroidEnvInterface,
     timeout_sec: Optional[float] = _DEFAULT_TIMEOUT_SECS,
 ) -> adb_pb2.AdbResponse:
@@ -775,9 +775,9 @@ def send_android_intent(
     command: str,
     action: str,
     env: env_interface.AndroidEnvInterface,
-    data_uri: str | None = None,
-    mime_type: str | None = None,
-    extras: dict[str, Any] | None = None,
+    data_uri: Optional[str] = None,
+    mime_type: Optional[str] = None,
+    extras: Optional[dict[str, Any]] = None,
     timeout_sec: int = _DEFAULT_TIMEOUT_SECS,
 ) -> adb_pb2.AdbResponse:
   """Sends an intent to Android device using adb.
